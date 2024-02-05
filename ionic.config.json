@@ -1,0 +1,7 @@
+{
+  "name": "Night-Life",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
