@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "night-life-7e16c": {
+      "hosting": {
+        "app": [
+          "night-life-7e16c"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "night-life-7e16c"
+  }
+}
