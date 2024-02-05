@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Firestore, addDoc, collection } from '@angular/fire/firestore';
 import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
 
 @Component({
@@ -9,5 +10,14 @@ import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/stan
   imports: [IonHeader, IonToolbar, IonTitle, IonContent],
 })
 export class HomePage {
-  constructor() {}
+  constructor(private firestore: Firestore) {
+    const collectionInst = collection(this.firestore, 'users');
+    addDoc(collectionInst, { email: "test", name: "person", password: "*******" }).then(() => {
+      console.log("Successfull Data Save");
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+
 }
