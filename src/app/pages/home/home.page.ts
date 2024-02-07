@@ -1,17 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent, IonList } from '@ionic/angular/standalone';
+import { IonContent, IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon } from '@ionic/angular/standalone';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
   standalone: true,
-  imports: [IonList, IonHeader, IonToolbar, IonTitle, IonContent],
+  imports: [IonIcon, IonLabel, IonTabButton, IonTabBar, IonTabs, IonContent],
 })
-export class HomePage implements OnInit{
-  constructor() {}
+export class HomePage implements OnInit {
+  constructor() { }
 
   ngOnInit(): void {
-      console.log("Home Page");
+    console.log("Home Page");
   }
 
 }
