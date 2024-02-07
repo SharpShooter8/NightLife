@@ -1,11 +1,11 @@
 <div class="container">
-  <form class="login-form" (ngSubmit)="login()">
+  <form class="signup-form" (ngSubmit)="signup()">
     <ion-item class="form-item" lines="none">
       <ion-input name="email" label="Email" labelPlacement="stacked" type="text" [(ngModel)]="email" required></ion-input>
     </ion-item>
     <ion-item class="form-item" lines="none">
       <ion-input name="password" label="Password" labelPlacement="stacked" type="password" [(ngModel)]="password" required></ion-input>
     </ion-item>
-    <ion-button class="login-button" expand="block" type="submit">Login</ion-button>
+    <ion-button class="signup-button" expand="block" type="submit">SignUp</ion-button>
   </form>
 </div>

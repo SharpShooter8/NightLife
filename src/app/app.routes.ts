@@ -7,7 +7,11 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'access-portal',
     pathMatch: 'full',
+  },
+  {
+    path: 'access-portal',
+    loadComponent: () => import('./pages/access-portal/access-portal.page').then( m => m.AccessPortalPage)
   },
 ];
