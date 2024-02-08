@@ -5,6 +5,8 @@ import { IonicModule } from '@ionic/angular';
 import { LoginComponent } from 'src/app/components/authentication/login/login.component';
 import { SignupComponent } from 'src/app/components/authentication/signup/signup.component';
 import { ResetPasswordComponent } from 'src/app/components/authentication/reset-password/reset-password.component';
+import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-access-portal',
@@ -15,10 +17,10 @@ import { ResetPasswordComponent } from 'src/app/components/authentication/reset-
 })
 export class AccessPortalPage implements OnInit {
 
-  constructor() { }
+  constructor(private auth: AuthenticationService, private router: Router) { }
 
   ngOnInit() {
-    console.log("Access Portal");
+    console.log("Created Access Portal");
   }
 
 }

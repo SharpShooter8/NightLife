@@ -23,17 +23,15 @@ export class LoginComponent implements OnInit {
     console.log("Created Login Component");
   }
 
-  login(): void {
+  async login(): Promise<void> {
     console.log(this.email);
     console.log(this.password);
-    this.auth.loginUser(this.email,this.password).then((data)=>{
-      console.log(data.user);
-      if(data.user != null){
-        this.router.navigateByUrl('/home')
-      }
-    }).catch((e)=> {
-      console.log(e);
-    })
+    let successLogin: boolean = await this.auth.loginUser(this.email,this.password);
+    if(successLogin){
+      console.log("Successful Login");
+    } else {
+      console.log("Unsuccessful Login");
+    }
   }
 
 }

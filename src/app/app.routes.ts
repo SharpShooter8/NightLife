@@ -1,18 +1,35 @@
 import { Routes } from '@angular/router';
 import { HomePage } from './pages/home/home.page';
+import { AuthGuard, redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/fire/auth-guard'
+import { AccessPortalPage } from './pages/access-portal/access-portal.page';
+import { ProfilePage } from './pages/profile/profile.page';
+import { MapPage } from './pages/map/map.page';
+
+const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
+const redirectLoggedInToHome = () => redirectLoggedInTo(['home/map']);
 
 export const routes: Routes = [
+
+  {
+    path: 'access-portal',
+    component: AccessPortalPage,
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectLoggedInToHome }
+  },
+
   {
     path: 'home',
     component: HomePage,
+    canActivate: [AuthGuard],
+    data: { authGuardPipe: redirectUnauthorizedToLogin },
     children: [
       {
         path: 'profile',
-        loadComponent: () => import('./pages/profile/profile.page').then( m => m.ProfilePage)
+        component: ProfilePage,
       },
       {
         path: 'map',
-        loadComponent: () => import('./pages/map/map.page').then( m => m.MapPage)
+        component: MapPage,
       },
     ],
   },
@@ -24,7 +41,9 @@ export const routes: Routes = [
   },
 
   {
-    path: 'access-portal',
-    loadComponent: () => import('./pages/access-portal/access-portal.page').then( m => m.AccessPortalPage)
+    path: '**',
+    redirectTo: 'access-portal',
+    pathMatch: 'full',
   },
+
 ];
