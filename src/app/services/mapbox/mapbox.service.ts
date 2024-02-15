@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
 export class MapboxService {
 
   map: mapboxgl.Map | undefined;
-  style = 'mapbox://styles/mapbox/streets-v11';
+  style = 'mapbox://styles/mapbox/standard';
   lat: number = 30.2672;
   lng: number = -97.7431;
 
@@ -19,8 +19,13 @@ export class MapboxService {
       accessToken: environment.mapbox.accessToken,
       container: container,
       style: this.style,
-      zoom: 12,
-      center: [this.lng, this.lat]
+      zoom: 19,
+      center: [this.lng, this.lat],
+      pitch: 90,
+      doubleClickZoom: false,
+      projection: {
+        name: 'mercator',
+      }
     });
 
     // Render Removes Weird Size Issue On Load

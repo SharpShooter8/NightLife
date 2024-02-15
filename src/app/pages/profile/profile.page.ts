@@ -30,7 +30,7 @@ export class ProfilePage implements OnInit {
     });
   }
 
-  async signOut(){
+  async signOut() {
     this.auth.signOut();
   }
 
