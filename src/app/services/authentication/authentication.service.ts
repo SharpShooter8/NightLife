@@ -23,7 +23,6 @@ export class AuthenticationService {
   authStatusListener() {
     this.ngFireAuth.onAuthStateChanged((user) => {
       if (user) {
-        console.log(user);
         this.authStatusSub.next(user);
         this.loggedIn = true;
         console.log('User is logged in');

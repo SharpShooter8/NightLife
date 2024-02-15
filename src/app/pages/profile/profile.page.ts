@@ -18,11 +18,16 @@ export class ProfilePage implements OnInit {
   lastSignedIn: string | undefined = "NA";
   id: string | null | undefined = "NA";
 
+  //Temp code delete when ID is no longer needed
+  protected viewID: boolean = false;
+  protected idAction: string = "View ID"
+
   constructor(private auth: AuthenticationService) { }
 
   ngOnInit() {
     console.log("Profile Page");
     this.auth.getUser().then(async (user) => {
+      console.log(user)
       this.userEmail = user?.email;
       this.id = await user?.getIdToken();
       this.creationDate = user?.metadata.creationTime;
@@ -32,6 +37,16 @@ export class ProfilePage implements OnInit {
 
   async signOut() {
     this.auth.signOut();
+  }
+
+  toggleViewID(){
+    if(this.viewID){
+      this.viewID = false;
+      this.idAction = "View ID";
+    } else{
+      this.viewID = true;
+      this.idAction = "Hide ID";
+    }
   }
 
 }

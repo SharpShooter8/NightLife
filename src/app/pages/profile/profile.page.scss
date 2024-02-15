@@ -1,0 +1,30 @@
+.main{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+
+}
+
+.button-container{
+    display: flex;
+}
+
+
+.profile-pic{
+    height: 70px;
+}
+
+.info-container{
+    flex: 2;
+}
+
+.date-container{
+    flex: 3;
+}
+
+.body{
+    position: relative;
+
+}
