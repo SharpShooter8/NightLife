@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as mapboxgl from 'mapbox-gl';
+import { Map } from 'mapbox-gl'
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -7,15 +7,15 @@ import { environment } from 'src/environments/environment';
 })
 export class MapboxService {
 
-  map: mapboxgl.Map | undefined;
+  map: Map | undefined;
   style = 'mapbox://styles/mapbox/standard';
   lat: number = 30.2672;
   lng: number = -97.7431;
 
-  constructor() {}
+  constructor() { }
 
-  initializeMap(container:string){
-    this.map = new mapboxgl.Map({
+  initializeMap(container: string) {
+    this.map = new Map({
       accessToken: environment.mapbox.accessToken,
       container: container,
       style: this.style,
@@ -39,15 +39,15 @@ export class MapboxService {
     });
   }
 
-  setStyle(style:string){
+  setStyle(style: string) {
     this.map?.setStyle(style);
   }
 
-  setZoom(zoom:number){
+  setZoom(zoom: number) {
     this.map?.setZoom(zoom);
   }
 
-  setCenter(lng:number, lat:number){
+  setCenter(lng: number, lat: number) {
     this.map?.setCenter([lng, lat]);
   }
 

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -9,42 +8,37 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AuthenticationService {
 
+  readonly loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  readonly currentUser: BehaviorSubject<firebase.default.User | null> = new BehaviorSubject<firebase.default.User | null>(null);
 
   constructor(private ngFireAuth: AngularFireAuth, private router: Router) {
     this.authStatusListener();
   }
 
-  currentUser: any = null;
-  private authStatusSub = new BehaviorSubject(this.currentUser);
-  currentAuthStatus = this.authStatusSub.asObservable();
-
-  loggedIn:boolean = false;
-
   authStatusListener() {
     this.ngFireAuth.onAuthStateChanged((user) => {
       if (user) {
-        console.log(user);
-        this.authStatusSub.next(user);
-        this.loggedIn = true;
+        this.currentUser.next(user);
+        this.loggedIn.next(true);
         console.log('User is logged in');
       } else {
-        this.authStatusSub.next(null);
-        this.loggedIn = false;
+        this.currentUser.next(null);
+        this.loggedIn.next(false);
         console.log('User is logged out');
       }
     });
   }
 
-  async getUser(){
+  async getUser() {
     return await this.ngFireAuth.currentUser;
   }
 
-  async registerUser(email: string, password: string): Promise<boolean> {
-    return await this.ngFireAuth.createUserWithEmailAndPassword(email, password).then(() => {
-      return true;
+  async registerUser(email: string, password: string): Promise<firebase.default.auth.UserCredential | null> {
+    return await this.ngFireAuth.createUserWithEmailAndPassword(email, password).then((userCred) => {
+      return userCred;
     }).catch((error) => {
       console.log(error);
-      return false;
+      return null;
     });
   }
 
@@ -76,9 +70,5 @@ export class AuthenticationService {
       this.router.navigateByUrl('');
       return false;
     });
-  }
-
-  isLoggedIn(): boolean {
-    return this.loggedIn;
   }
 }

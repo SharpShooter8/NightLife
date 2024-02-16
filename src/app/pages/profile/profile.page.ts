@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { FriendsComponent } from 'src/app/components/user/friends/friends.component';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, FriendsComponent]
 })
 export class ProfilePage implements OnInit {
 
@@ -24,14 +25,16 @@ export class ProfilePage implements OnInit {
     console.log("Profile Page");
     this.auth.getUser().then(async (user) => {
       this.userEmail = user?.email;
-      this.id = await user?.getIdToken();
+      this.id = await user?.uid;
       this.creationDate = user?.metadata.creationTime;
       this.lastSignedIn = user?.metadata.lastSignInTime;
     });
   }
 
+  async test() { }
+
   async signOut() {
-    this.auth.signOut();
+    await this.auth.signOut();
   }
 
 }
