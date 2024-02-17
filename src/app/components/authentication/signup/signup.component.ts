@@ -13,6 +13,7 @@ import { UserService } from 'src/app/services/database/user.service';
 })
 export class SignupComponent  implements OnInit {
 
+  username:string = "";
   email:string = "";
   password:string = "";
 
@@ -23,11 +24,12 @@ export class SignupComponent  implements OnInit {
   }
 
   signup():void {
+    console.log(this.username);
     console.log(this.email);
     console.log(this.password);
-    this.auth.registerUser(this.email, this.password).then((data)=>{
-      if(data?.user){
-        this.userData.createUser(data.user.uid);
+    this.auth.registerUser(this.email, this.password, this.username).then((data)=>{
+      if(data){
+        this.userData.createUser(data.uid, this.username);
       }
       console.log(data);
     }).catch((e) => {

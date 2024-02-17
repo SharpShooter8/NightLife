@@ -1,8 +1,23 @@
 <div id="container">
+
+  <form class="signup-form" (ngSubmit)="addFriend()">
+    <ion-item class="form-item" lines="none">
+      <ion-input name="newFriend" label="Add New Friend" labelPlacement="stacked" type="text" [(ngModel)]="newFriend"
+        required></ion-input>
+    </ion-item>
+    <ion-button class="signup-button" expand="block" type="submit">Add New Friend</ion-button>
+  </form>
+
   <ion-list>
     @for(friend of friendsList; track friend){
     <ion-item>
-      <ion-text>{{friend}}</ion-text>
+      <ion-item-group>
+
+      </ion-item-group>
+      <ion-text>{{friend.username}}</ion-text>
+      <ion-item>{{friend.status}}</ion-item>
+      <ion-button (click)="acceptFriendRequest(friend.uid)">Accept</ion-button>
+      <ion-button (click)="removeFriend(friend.uid)">Remove</ion-button>
     </ion-item>
     }
   </ion-list>

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { User, updateProfile } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -29,46 +30,56 @@ export class AuthenticationService {
     });
   }
 
-  async getUser() {
-    return await this.ngFireAuth.currentUser;
-  }
-
-  async registerUser(email: string, password: string): Promise<firebase.default.auth.UserCredential | null> {
-    return await this.ngFireAuth.createUserWithEmailAndPassword(email, password).then((userCred) => {
-      return userCred;
-    }).catch((error) => {
+  async registerUser(email: string, password: string, username: string): Promise<firebase.default.User | null> {
+    try {
+      const data = await this.ngFireAuth.createUserWithEmailAndPassword(email, password);
+      const update = await this.updateUserProfile({username: username});
+      return data.user;
+    } catch (error) {
       console.log(error);
       return null;
-    });
+    }
+  }
+
+  async updateUserProfile(data: Profile): Promise<void> {
+    return (await this.ngFireAuth.currentUser)?.updateProfile(data);
   }
 
   async loginUser(email: string, password: string): Promise<boolean> {
-    return await this.ngFireAuth.signInWithEmailAndPassword(email, password).then(() => {
+    try {
+      await this.ngFireAuth.signInWithEmailAndPassword(email, password);
       this.router.navigateByUrl('/home/map');
       return true;
-    }).catch((error) => {
+    } catch (error) {
       console.log(error);
       return false;
-    });
+    }
   }
 
   async resetPassword(email: string): Promise<boolean> {
-    return await this.ngFireAuth.sendPasswordResetEmail(email).then(() => {
+    try {
+      await this.ngFireAuth.sendPasswordResetEmail(email);
       return true;
-    }).catch((error) => {
+    } catch (error) {
       console.log(error);
       return false;
-    });
+    }
   }
 
   async signOut(): Promise<boolean> {
-    return await this.ngFireAuth.signOut().then(() => {
+    try {
+      await this.ngFireAuth.signOut();
       this.router.navigateByUrl('access-portal');
       return true;
-    }).catch((error) => {
+    } catch (error) {
       console.log(error);
       this.router.navigateByUrl('');
       return false;
-    });
+    }
   }
+}
+
+export interface Profile {
+  username?: string | null;
+  photoURL?: string | null;
 }

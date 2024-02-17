@@ -23,15 +23,15 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     console.log("Profile Page");
-    this.auth.getUser().then(async (user) => {
-      this.userEmail = user?.email;
-      this.id = await user?.uid;
-      this.creationDate = user?.metadata.creationTime;
-      this.lastSignedIn = user?.metadata.lastSignInTime;
-    });
+    let user = this.auth.currentUser.getValue();
+    this.userEmail = user?.email;
+    this.id = user?.uid;
+    this.creationDate = user?.metadata.creationTime;
+    this.lastSignedIn = user?.metadata.lastSignInTime;
   }
 
-  async test() { }
+  async test() {
+  }
 
   async signOut() {
     await this.auth.signOut();
