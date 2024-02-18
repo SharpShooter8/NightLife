@@ -8,9 +8,9 @@ import { FoursquareService, PlaceSearchResult } from 'src/app/services/foursquar
   templateUrl: './foursquare-searchbox.component.html',
   styleUrls: ['./foursquare-searchbox.component.scss'],
   standalone: true,
-  imports:[IonicModule]
+  imports: [IonicModule]
 })
-export class FoursquareSearchboxComponent  implements OnInit {
+export class FoursquareSearchboxComponent implements OnInit {
 
   @Output() searchResults = new EventEmitter<PlaceSearchResult>();
 
@@ -20,14 +20,14 @@ export class FoursquareSearchboxComponent  implements OnInit {
     console.log("FourSquare Search Box Created");
   }
 
-  async postSearchResults(query:string){
-    await firstValueFrom(this.foursquare.placeSearch({ query: query, fields: "name,location,hours" })).then((data) => {
+  async postSearchResults(query: string) {
+    await firstValueFrom(this.foursquare.placeSearch({ query: query, fields: "name,location,hours,photos" })).then((data) => {
       this.searchResults.emit(data);
     }
     );
   }
 
-  async handleInput(event:any) {
+  async handleInput(event: any) {
     const query = event.target.value.toLowerCase();
     await this.postSearchResults(query);
   }
