@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore'
 import { FieldValue, arrayRemove, arrayUnion } from '@angular/fire/firestore';
-import * as firebase from 'firebase/compat';
-import { Observable, firstValueFrom, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, firstValueFrom, from, map, of, switchMap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -15,122 +14,183 @@ export class UserService {
     this.userRef = this.db.collection('Users');
   }
 
-  createUser(uid: string, username: string): Promise<void> {
-    return this.userRef.doc(uid).set({
-      username: username,
-      friends: [],
-    }, { merge: true });
+  async createUser(uid: string, username: string): Promise<void> {
+    try {
+      return await this.userRef.doc(uid).set({
+        username: username,
+        friends: [],
+      }, { merge: true });
+    } catch (error) {
+      console.error("Error in createUser:", error); // Log any errors
+      throw error; // Rethrow the error for further handling
+    }
   }
 
   getUserData(uid: string): Observable<firebase.default.firestore.DocumentSnapshot<UserData>> {
-    return this.userRef.doc(uid).get();
+    return from(this.userRef.doc(uid).get()).pipe(
+      catchError(error => {
+        console.error("Error in getUserData:", error); // Log any errors
+        throw error; // Rethrow the error to be caught by the subscriber
+      })
+    );
   }
 
   getUidGivenUsername(username: string): Observable<string | undefined> {
+    // Fetch the document with the provided username from Firestore
     return this.db.collection('Users', ref => ref.where('username', '==', username)).get().pipe(
-      map(data => {
-        const doc = data.docs[0];
-        return doc ? doc.id : undefined;
+      map(snapshot => {
+        const doc = snapshot.docs[0]; // Get the first document from the snapshot
+        return doc ? doc.id : undefined; // Return the document ID if found, otherwise undefined
+      }),
+      catchError(error => {
+        console.error("Error in getUidGivenUsername:", error); // Log any errors
+        return of(undefined); // Return an observable with undefined in case of an error
       })
     );
   }
 
   doesUserDocExist(uid: string): Observable<boolean> {
-    return this.userRef.doc(uid).get().pipe(map(data => { return data.exists }));
+    return from(this.userRef.doc(uid).get()).pipe(
+      map(snapshot => snapshot.exists),
+      catchError(error => {
+        console.error("Error in doesUserDocExist:", error); // Log any errors
+        return of(false); // Return false in case of an error
+      })
+    );
   }
 
   getFriendRequestStatus(uid: string, friendUID: string): Observable<FriendStatus | undefined> {
+    // Fetch the user document from Firestore
     return this.userRef.doc(uid).get().pipe(
       map(data => {
-        const friends = data.data()?.friends as Friend[];
-        const friend = friends.find(friend => friend.uid === friendUID);
-        return friend ? friend.status : undefined;
+        const friends = data.data()?.friends as Friend[]; // Extract the friends array from the user data
+        const friend = friends.find(friend => friend.uid === friendUID); // Find the friend with the given UID
+        return friend ? friend.status : undefined; // Return the status of the friend if found, otherwise undefined
+      }),
+      catchError(error => {
+        console.error("Error in getFriendRequestStatus:", error); // Log any errors
+        return of(undefined); // Return an observable with undefined in case of an error
       })
     );
   }
 
   async addFriend(uid: string, friendUID: string): Promise<boolean> {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        let uidDoc = await firstValueFrom(this.doesUserDocExist(uid));
-        let friendUidDoc = await firstValueFrom(this.doesUserDocExist(friendUID));
-        let uidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(uid, friendUID));
-        let friendUidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(friendUID, uid));
+    try {
+      // Check if both user documents exist
+      const [uidDocExist, friendUidDocExist] = await Promise.all([
+        firstValueFrom(this.doesUserDocExist(uid)),
+        firstValueFrom(this.doesUserDocExist(friendUID))
+      ]);
 
-        if (uidDoc && friendUidDoc && (uidRequestStatus == undefined) && (friendUidRequestStatus == undefined)) {
-          this.userRef.doc(uid).update({ friends: arrayUnion({ uid: friendUID, status: FriendStatus.Sent }) });
-          this.userRef.doc(friendUID).update({ friends: arrayUnion({ uid: uid, status: FriendStatus.Pending }) });
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      } catch (e) {
-        resolve(false);
+      // Get friend request status for both users
+      const [uidRequestStatus, friendUidRequestStatus] = await Promise.all([
+        firstValueFrom(this.getFriendRequestStatus(uid, friendUID)),
+        firstValueFrom(this.getFriendRequestStatus(friendUID, uid))
+      ]);
+
+      // Check if user documents exist and there are no pending friend requests
+      if (uidDocExist && friendUidDocExist && !uidRequestStatus && !friendUidRequestStatus) {
+        // Update both users' friend lists with the appropriate statuses
+        await Promise.all([
+          this.userRef.doc(uid).update({ friends: arrayUnion({ uid: friendUID, status: FriendStatus.Sent }) }),
+          this.userRef.doc(friendUID).update({ friends: arrayUnion({ uid: uid, status: FriendStatus.Pending }) })
+        ]);
+        return true; // Operation successful
+      } else {
+        return false; // Operation failed
       }
-    });
+    } catch (error) {
+      console.error("Error in addFriend:", error); // Log any unexpected errors
+      return false; // Operation failed
+    }
   }
 
-  removeFriend(uid: string, friendUID: string): Promise<boolean> {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        let uidDoc = await firstValueFrom(this.doesUserDocExist(uid));
-        let friendUidDoc = await firstValueFrom(this.doesUserDocExist(friendUID));
-        let uidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(uid, friendUID));
-        let friendUidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(friendUID, uid));
+  async removeFriend(uid: string, friendUID: string): Promise<boolean> {
+    try {
+      // Check if both user documents exist
+      const [uidDocExist, friendUidDocExist] = await Promise.all([
+        firstValueFrom(this.doesUserDocExist(uid)),
+        firstValueFrom(this.doesUserDocExist(friendUID))
+      ]);
 
-        if (uidDoc && friendUidDoc && (uidRequestStatus != undefined) && (friendUidRequestStatus != undefined)) {
-          this.userRef.doc(uid).update({ friends: arrayRemove({ uid: friendUID, status: uidRequestStatus }) });
-          this.userRef.doc(friendUID).update({ friends: arrayRemove({ uid: uid, status: friendUidRequestStatus }) });
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      } catch (e) {
-        resolve(false);
+      // Get friend request status for both users
+      const [uidRequestStatus, friendUidRequestStatus] = await Promise.all([
+        firstValueFrom(this.getFriendRequestStatus(uid, friendUID)),
+        firstValueFrom(this.getFriendRequestStatus(friendUID, uid))
+      ]);
+
+      // Check if user documents exist and there are pending friend requests
+      if (uidDocExist && friendUidDocExist && uidRequestStatus !== undefined && friendUidRequestStatus !== undefined) {
+        // Remove both users from each other's friend lists
+        await Promise.all([
+          this.userRef.doc(uid).update({ friends: arrayRemove({ uid: friendUID, status: uidRequestStatus }) }),
+          this.userRef.doc(friendUID).update({ friends: arrayRemove({ uid: uid, status: friendUidRequestStatus }) })
+        ]);
+        return true; // Operation successful
+      } else {
+        return false; // Operation failed
       }
-    });
+    } catch (error) {
+      console.error("Error in removeFriend:", error); // Log any unexpected errors
+      return false; // Operation failed
+    }
   }
 
-  updateFriendRequestStatus(uid: string, friendUID: string, newStatus: FriendStatus): Promise<boolean> {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        let uidDoc = await firstValueFrom(this.doesUserDocExist(uid));
-        let uidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(uid, friendUID));
+  async updateFriendRequestStatus(uid: string, friendUID: string, newStatus: FriendStatus): Promise<boolean> {
+    try {
+      // Check if user document exists and get the current friend request status
+      const [uidDocExist, uidRequestStatus] = await Promise.all([
+        firstValueFrom(this.doesUserDocExist(uid)),
+        firstValueFrom(this.getFriendRequestStatus(uid, friendUID)),
+      ]);
 
-        if (uidDoc && (uidRequestStatus != newStatus) && (uidRequestStatus != undefined)) {
-          this.userRef.doc(uid).update({ friends: arrayRemove({ uid: friendUID, status: uidRequestStatus }) });
-          this.userRef.doc(uid).update({ friends: arrayUnion({ uid: friendUID, status: newStatus }) });
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      } catch (e) {
-        resolve(false);
+      // Check if user document exists and current status is defined and different from new status
+      if (uidDocExist && uidRequestStatus !== undefined && uidRequestStatus !== newStatus) {
+        // Update the friend request status in the user's friend list
+        await Promise.all([
+          this.userRef.doc(uid).update({ friends: arrayRemove({ uid: friendUID, status: uidRequestStatus }) }),
+          this.userRef.doc(uid).update({ friends: arrayUnion({ uid: friendUID, status: newStatus }) })
+        ]);
+        return true; // Operation successful
+      } else {
+        return false; // Operation failed
       }
-    });
+    } catch (error) {
+      console.error("Error in updateFriendRequestStatus:", error); // Log any unexpected errors
+      return false; // Operation failed
+    }
   }
 
-  acceptFriendRequest(uid: string, friendUID: string): Promise<boolean> {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        let uidDoc = await firstValueFrom(this.doesUserDocExist(uid));
-        let friendUidDoc = await firstValueFrom(this.doesUserDocExist(friendUID));
-        let uidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(uid, friendUID));
-        let friendUidRequestStatus = await firstValueFrom(this.getFriendRequestStatus(friendUID, uid));
+  async acceptFriendRequest(uid: string, friendUID: string): Promise<boolean> {
+    try {
+      // Check if both user documents exist
+      const [uidDocExist, friendUidDocExist] = await Promise.all([
+        firstValueFrom(this.doesUserDocExist(uid)),
+        firstValueFrom(this.doesUserDocExist(friendUID))
+      ]);
 
-        if (uidDoc && friendUidDoc && (uidRequestStatus == FriendStatus.Sent) && (friendUidRequestStatus == FriendStatus.Pending)) {
-          this.updateFriendRequestStatus(uid, friendUID, FriendStatus.Accepted);
-          this.updateFriendRequestStatus(friendUID, uid, FriendStatus.Accepted);
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      } catch (e) {
-        resolve(false);
+      // Get friend request status for both users
+      const [uidRequestStatus, friendUidRequestStatus] = await Promise.all([
+        firstValueFrom(this.getFriendRequestStatus(uid, friendUID)),
+        firstValueFrom(this.getFriendRequestStatus(friendUID, uid))
+      ]);
+
+      // Check if user documents exist and friend requests are in the correct states
+      if (uidDocExist && friendUidDocExist && uidRequestStatus === FriendStatus.Sent && friendUidRequestStatus === FriendStatus.Pending) {
+        // Update friend request statuses for both users to "Accepted"
+        await Promise.all([
+          this.updateFriendRequestStatus(uid, friendUID, FriendStatus.Accepted),
+          this.updateFriendRequestStatus(friendUID, uid, FriendStatus.Accepted)
+        ]);
+        return true; // Operation successful
+      } else {
+        return false; // Operation failed
       }
-    });
+    } catch (error) {
+      console.error("Error in acceptFriendRequest:", error); // Log any unexpected errors
+      return false; // Operation failed
+    }
   }
-
 }
 
 export interface UserData {

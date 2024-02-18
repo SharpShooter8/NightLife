@@ -1,0 +1,10 @@
+<div id="container">
+  <app-foursquare-searchbox (searchResults)="getSearchData($event)"></app-foursquare-searchbox>
+
+  <ion-list>
+    @for(place of poi; track place){
+      <app-foursquare-result [placeData]="place"></app-foursquare-result>
+    }
+  </ion-list>
+</div>
+

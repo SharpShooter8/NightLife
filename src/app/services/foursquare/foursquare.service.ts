@@ -68,7 +68,7 @@ export class FoursquareService {
     });
   }
 
-  addressDetails(fsq_addr_id:string, query: AddressDetailsQuery): Observable<AddressDetailsResult> {
+  addressDetails(fsq_addr_id: string, query: AddressDetailsQuery): Observable<AddressDetailsResult> {
     const url = `https://api.foursquare.com/v3/address/${fsq_addr_id}`;
     return this.http.get<AddressDetailsResult>(url, {
       params: query as any,
@@ -424,22 +424,25 @@ export interface Place {
   verified: boolean;
   website: string;
 }
+
+export interface AutoCompletePlace {
+  type: string;
+  text: Text;
+  icon: Photo;
+  link: string;
+  place: Place;
+  address: {
+    address_id: string;
+  };
+  search: Search;
+  geo: Geo;
+  debug: {
+    score: number;
+  };
+}
+
 export interface AutoCompleteResult {
-  results: {
-    type: string;
-    text: Text;
-    icon: Photo;
-    link: string;
-    place: Place;
-    address: {
-      address_id: string;
-    };
-    search: Search;
-    geo: Geo;
-    debug: {
-      score: number;
-    };
-  }[];
+  results: AutoCompletePlace[];
 }
 export interface AddressDetailsResult {
   fsq_addr_id: string;
