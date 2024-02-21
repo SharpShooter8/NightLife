@@ -1,13 +1,11 @@
 <ion-item>
-  <swiper-container>
-
+  <swiper-container [loop]="true">
     @for(photo of placeData?.photos; track photo){
       <swiper-slide>
         <ion-img [src]="photo.prefix + '200x200' + photo.suffix"></ion-img>
       </swiper-slide>
     }
   </swiper-container>
-
 
   <ion-label>{{ placeData?.name}}</ion-label>
   <ion-label>{{ placeData?.location?.formatted_address }}</ion-label>

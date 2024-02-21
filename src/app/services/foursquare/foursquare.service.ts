@@ -94,7 +94,7 @@ export interface PlaceSearchQuery {
   sw?: string;
   near?: string;
   polygon?: string;
-  sort?: 'relevance' | 'rating' | 'distance' | 'popularity';
+  sort?: 'RELEVANCE' | 'RATING' | 'DISTANCE' | 'POPULARITY';
   limit?: number;
   session_token?: string;
   super_venue_id?: string;
@@ -424,7 +424,6 @@ export interface Place {
   verified: boolean;
   website: string;
 }
-
 export interface AutoCompletePlace {
   type: string;
   text: Text;
@@ -440,7 +439,6 @@ export interface AutoCompletePlace {
     score: number;
   };
 }
-
 export interface AutoCompleteResult {
   results: AutoCompletePlace[];
 }

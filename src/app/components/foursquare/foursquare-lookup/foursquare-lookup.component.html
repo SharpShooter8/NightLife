@@ -1,10 +1,16 @@
 <div id="container">
-  <app-foursquare-searchbox (searchResults)="getSearchData($event)"></app-foursquare-searchbox>
+  <ion-searchbar [debounce]="1000" (ionInput)="handleInput($event)"></ion-searchbar>
 
-  <ion-list>
+  <ion-accordion-group>
     @for(place of poi; track place){
-      <app-foursquare-result [placeData]="place"></app-foursquare-result>
+      <ion-accordion value="{{$index}}">
+        <ion-item slot="header">
+          <ion-label>{{place.name}}</ion-label>
+           <ion-label>{{ (place.distance * 0.000621371) | number:'1.2-2' }} miles away</ion-label>
+          <ion-label>{{place.rating}}/10 rating</ion-label>
+        </ion-item>
+        <app-foursquare-result [placeData]="place" slot="content"></app-foursquare-result>
+      </ion-accordion>
     }
-  </ion-list>
+  </ion-accordion-group>
 </div>
-
