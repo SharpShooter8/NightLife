@@ -35,6 +35,11 @@ export class UserService {
     );
   }
 
+  getUserObject(uid: string): Observable<any>{
+    let temp = this.db.doc(`Users/${uid}`).valueChanges();
+    return temp;
+  }
+
   getUidGivenUsername(username: string): Observable<string | undefined> {
     // Fetch the document with the provided username from Firestore
     return this.db.collection('Users', ref => ref.where('username', '==', username)).get().pipe(
@@ -191,6 +196,8 @@ export class UserService {
       return false; // Operation failed
     }
   }
+
+
 }
 
 export interface UserData {
