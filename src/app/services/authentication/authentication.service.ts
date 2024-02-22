@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-
+import { User, updateProfile } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
@@ -9,75 +9,77 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AuthenticationService {
 
+  readonly loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  readonly currentUser: BehaviorSubject<firebase.default.User | null> = new BehaviorSubject<firebase.default.User | null>(null);
 
   constructor(private ngFireAuth: AngularFireAuth, private router: Router) {
     this.authStatusListener();
   }
 
-  currentUser: any = null;
-  private authStatusSub = new BehaviorSubject(this.currentUser);
-  currentAuthStatus = this.authStatusSub.asObservable();
-
-  loggedIn:boolean = false;
-
   authStatusListener() {
     this.ngFireAuth.onAuthStateChanged((user) => {
       if (user) {
-        this.authStatusSub.next(user);
-        this.loggedIn = true;
+        this.currentUser.next(user);
+        this.loggedIn.next(true);
         console.log('User is logged in');
       } else {
-        this.authStatusSub.next(null);
-        this.loggedIn = false;
+        this.currentUser.next(null);
+        this.loggedIn.next(false);
         console.log('User is logged out');
       }
     });
   }
 
-  async getUser(){
-    return await this.ngFireAuth.currentUser;
+  async registerUser(email: string, password: string, username: string): Promise<firebase.default.User | null> {
+    try {
+      const data = await this.ngFireAuth.createUserWithEmailAndPassword(email, password);
+      const update = await this.updateUserProfile({username: username});
+      return data.user;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 
-  async registerUser(email: string, password: string): Promise<boolean> {
-    return await this.ngFireAuth.createUserWithEmailAndPassword(email, password).then(() => {
-      return true;
-    }).catch((error) => {
-      console.log(error);
-      return false;
-    });
+  async updateUserProfile(data: Profile): Promise<void> {
+    return (await this.ngFireAuth.currentUser)?.updateProfile(data);
   }
 
   async loginUser(email: string, password: string): Promise<boolean> {
-    return await this.ngFireAuth.signInWithEmailAndPassword(email, password).then(() => {
+    try {
+      await this.ngFireAuth.signInWithEmailAndPassword(email, password);
       this.router.navigateByUrl('/home/map');
       return true;
-    }).catch((error) => {
+    } catch (error) {
       console.log(error);
       return false;
-    });
+    }
   }
 
   async resetPassword(email: string): Promise<boolean> {
-    return await this.ngFireAuth.sendPasswordResetEmail(email).then(() => {
+    try {
+      await this.ngFireAuth.sendPasswordResetEmail(email);
       return true;
-    }).catch((error) => {
+    } catch (error) {
       console.log(error);
       return false;
-    });
+    }
   }
 
   async signOut(): Promise<boolean> {
-    return await this.ngFireAuth.signOut().then(() => {
+    try {
+      await this.ngFireAuth.signOut();
       this.router.navigateByUrl('access-portal');
       return true;
-    }).catch((error) => {
+    } catch (error) {
       console.log(error);
       this.router.navigateByUrl('');
       return false;
-    });
+    }
   }
+}
 
-  isLoggedIn(): boolean {
-    return this.loggedIn;
-  }
+export interface Profile {
+  username?: string | null;
+  photoURL?: string | null;
 }

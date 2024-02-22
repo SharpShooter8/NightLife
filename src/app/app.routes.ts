@@ -4,9 +4,12 @@ import { AuthGuard, redirectLoggedInTo, redirectUnauthorizedTo } from '@angular/
 import { AccessPortalPage } from './pages/access-portal/access-portal.page';
 import { ProfilePage } from './pages/profile/profile.page';
 import { MapPage } from './pages/map/map.page';
+import { DashboardPage } from './pages/dashboard/dashboard.page';
+import { BrowsePage } from './pages/browse/browse.page';
+import { SocialPage } from './pages/social/social.page';
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
-const redirectLoggedInToHome = () => redirectLoggedInTo(['home/map']);
+const redirectLoggedInToHome = () => redirectLoggedInTo(['home/dashboard']);
 
 export const routes: Routes = [
 
@@ -28,9 +31,21 @@ export const routes: Routes = [
         component: ProfilePage,
       },
       {
+        path: 'browse',
+        component: BrowsePage,
+      },
+      {
+        path: 'social',
+        component: SocialPage,
+      },
+      {
         path: 'map',
         component: MapPage,
       },
+      {
+        path: 'dashboard',
+        component: DashboardPage,
+      }
     ],
   },
 
@@ -45,5 +60,4 @@ export const routes: Routes = [
     redirectTo: 'access-portal',
     pathMatch: 'full',
   },
-
 ];

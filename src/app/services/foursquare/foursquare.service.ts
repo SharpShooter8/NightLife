@@ -3,7 +3,6 @@ import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -13,15 +12,15 @@ export class FoursquareService {
 
   constructor(private http: HttpClient) { }
 
-  placeSearch(query: placeSearchQuery): Observable<placeSearchResult> {
+  placeSearch(query: PlaceSearchQuery): Observable<PlaceSearchResult> {
     const url = `https://api.foursquare.com/v3/places/search`;
-    return this.http.get<placeSearchResult>(url, {
+    return this.http.get<PlaceSearchResult>(url, {
       params: query as any,
       headers: this.headers
     });
   }
 
-  placeDetails(fsq_id: string, query: placeDetailsQuery): Observable<Place> {
+  placeDetails(fsq_id: string, query: PlaceDetailsQuery): Observable<Place> {
     const url = `https://api.foursquare.com/v3/places/${fsq_id}`;
     return this.http.get<Place>(url, {
       params: query as any,
@@ -29,7 +28,7 @@ export class FoursquareService {
     });
   }
 
-  placePhotos(fsq_id: string, query: placePhotosQuery): Observable<Photo[]> {
+  placePhotos(fsq_id: string, query: PlacePhotosQuery): Observable<Photo[]> {
     const url = `https://api.foursquare.com/v3/places/${fsq_id}/photos`;
     return this.http.get<Photo[]>(url, {
       params: query as any,
@@ -37,15 +36,15 @@ export class FoursquareService {
     });
   }
 
-  placeTips(fsq_id: string, query: placeTipsQuery): Observable<placeTipsResult[]> {
+  placeTips(fsq_id: string, query: PlaceTipsQuery): Observable<PlaceTipsResult[]> {
     const url = `https://api.foursquare.com/v3/places/${fsq_id}/tips`;
-    return this.http.get<placeTipsResult[]>(url, {
+    return this.http.get<PlaceTipsResult[]>(url, {
       params: query as any,
       headers: this.headers
     });
   }
 
-  placeMatch(query: placeMatchQuery): Observable<Place> {
+  placeMatch(query: PlaceMatchQuery): Observable<Place> {
     const url = `https://api.foursquare.com/v3/places/match`;
     return this.http.get<Place>(url, {
       params: query as any,
@@ -53,32 +52,32 @@ export class FoursquareService {
     });
   }
 
-  findNearby(query: findNearbyQuery): Observable<findNearbyResult> {
+  findNearby(query: FindNearbyQuery): Observable<FindNearbyResult> {
     const url = `https://api.foursquare.com/v3/places/nearby`;
-    return this.http.get<findNearbyResult>(url, {
+    return this.http.get<FindNearbyResult>(url, {
       params: query as any,
       headers: this.headers
     });
   }
 
-  autoComplete(query: autoCompleteQuery): Observable<autoCompleteResult> {
+  autoComplete(query: AutoCompleteQuery): Observable<AutoCompleteResult> {
     const url = `https://api.foursquare.com/v3/autocomplete`;
-    return this.http.get<autoCompleteResult>(url, {
+    return this.http.get<AutoCompleteResult>(url, {
       params: query as any,
       headers: this.headers
     });
   }
 
-  addressDetails(fsq_addr_id:string, query: addressDetailsQuery): Observable<addressDetailsResult> {
+  addressDetails(fsq_addr_id: string, query: AddressDetailsQuery): Observable<AddressDetailsResult> {
     const url = `https://api.foursquare.com/v3/address/${fsq_addr_id}`;
-    return this.http.get<addressDetailsResult>(url, {
+    return this.http.get<AddressDetailsResult>(url, {
       params: query as any,
       headers: this.headers
     });
   }
 }
 
-export interface placeSearchQuery {
+export interface PlaceSearchQuery {
   query?: string;
   ll?: string;
   radius?: number;
@@ -95,30 +94,30 @@ export interface placeSearchQuery {
   sw?: string;
   near?: string;
   polygon?: string;
-  sort?: 'relevance' | 'rating' | 'distance' | 'popularity';
+  sort?: 'RELEVANCE' | 'RATING' | 'DISTANCE' | 'POPULARITY';
   limit?: number;
   session_token?: string;
   super_venue_id?: string;
 }
 
-export interface placeDetailsQuery {
+export interface PlaceDetailsQuery {
   fields?: string;
   session_token?: string;
 }
 
-export interface placePhotosQuery {
+export interface PlacePhotosQuery {
   limit?: number;
   sort?: "popular" | "newest";
   classifications?: ('food' | 'indoor' | 'menu' | 'outdoor')[];
 }
 
-export interface placeTipsQuery {
+export interface PlaceTipsQuery {
   limit?: number;
   sort?: "popular" | "newest";
   fields?: string;
 }
 
-export interface placeMatchQuery {
+export interface PlaceMatchQuery {
   name: string;
   address?: string;
   city?: string;
@@ -129,7 +128,7 @@ export interface placeMatchQuery {
   fields?: string;
 }
 
-export interface findNearbyQuery {
+export interface FindNearbyQuery {
   fields?: string;
   ll?: string;
   hacc?: number;
@@ -138,7 +137,7 @@ export interface findNearbyQuery {
   limit?: number;
 }
 
-export interface autoCompleteQuery {
+export interface AutoCompleteQuery {
   query: string;
   ll?: string;
   radius?: number;
@@ -148,11 +147,11 @@ export interface autoCompleteQuery {
   limit?: number;
 }
 
-export interface addressDetailsQuery {
+export interface AddressDetailsQuery {
   session_token: string;
 }
 
-export interface placeSearchResult {
+export interface PlaceSearchResult {
   context: {
     geobounds: {
       circle: {
@@ -165,11 +164,11 @@ export interface placeSearchResult {
   results: Place[];
 }
 
-export interface findNearbyResult {
+export interface FindNearbyResult {
   results: Place[];
 }
 
-export interface placeTipsResult {
+export interface PlaceTipsResult {
   id: string;
   created_at: string;
   text: string;
@@ -425,24 +424,25 @@ export interface Place {
   verified: boolean;
   website: string;
 }
-export interface autoCompleteResult {
-  results: {
-    type: string;
-    text: Text;
-    icon: Photo;
-    link: string;
-    place: Place;
-    address: {
-      address_id: string;
-    };
-    search: Search;
-    geo: Geo;
-    debug: {
-      score: number;
-    };
-  }[];
+export interface AutoCompletePlace {
+  type: string;
+  text: Text;
+  icon: Photo;
+  link: string;
+  place: Place;
+  address: {
+    address_id: string;
+  };
+  search: Search;
+  geo: Geo;
+  debug: {
+    score: number;
+  };
 }
-export interface addressDetailsResult {
+export interface AutoCompleteResult {
+  results: AutoCompletePlace[];
+}
+export interface AddressDetailsResult {
   fsq_addr_id: string;
   location: Location;
   geocodes: GeoCodes;

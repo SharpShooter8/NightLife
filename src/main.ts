@@ -10,7 +10,7 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import {AngularFireModule} from '@angular/fire/compat'
-import { HttpClientModule, provideHttpClient, withFetch } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
 
 if (environment.production) {
   enableProdMode();

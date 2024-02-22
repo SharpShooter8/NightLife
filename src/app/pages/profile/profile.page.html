@@ -6,36 +6,5 @@
   <p>Last Signed In Date: {{ lastSignedIn }}</p>
 
   <ion-button (click)="signOut()">Sign Out</ion-button>
-</div> -->
-
-<ion-content class="body" [fullscreen]="true">
-  <div class="main">
-    <h1 style="flex: 1">User Profile</h1>
-  
-    <div class="pic-container">
-      <img class="profile-pic" src="../../../assets/Default_pfp.svg.png">
-    </div>
-  
-    <div class="info-container">
-      <p>Email: {{ userEmail }}</p>
-    </div>
-  
-    <div class="date-container">
-      <p>Creation Date: {{ creationDate }}</p>
-      <p>Last Signed In Date: {{ lastSignedIn }}</p>
-    </div>
-  
-    <div class="button-container">
-      <ion-button (click)="signOut()">Sign Out</ion-button>
-      <ion-button (click)="toggleViewID()">{{idAction}}</ion-button>
-    </div>
-
-    <div *ngIf="viewID" class="id">
-      <p>ID: {{ id }}</p>
-    </div>
-
-
-
-  </div>
-</ion-content>
-
+  <ion-button (click)="test()"> Testing</ion-button>
+</div>

@@ -18,6 +18,9 @@ export const environment = {
   },
   foursquare: {
     apiKey: "fsq3Mh3rBe7wCvUgPmOSMyhF41lKgDrklKDPG+AsJloDPeo=",
+  },
+  opencage: {
+    apiKey: "8809f9ddd46243988ea52f97d1dd5c23",
   }
 };
 
