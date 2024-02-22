@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
+import { UserService } from 'src/app/services/database/user.service'
 
 @Component({
   selector: 'app-profile',
@@ -18,19 +19,23 @@ export class ProfilePage implements OnInit {
   lastSignedIn: string | undefined = "NA";
   id: string | null | undefined = "NA";
 
-  //Temp code delete when ID is no longer needed
-  protected viewID: boolean = false;
-  protected idAction: string = "View ID"
+  protected userService = inject(UserService);
+  protected userObject!: any;
 
   constructor(private auth: AuthenticationService) { }
 
   ngOnInit() {
-    console.log("Profile Page");
     let user = this.auth.currentUser.getValue();
     this.userEmail = user?.email;
     this.id = user?.uid;
     this.creationDate = user?.metadata.creationTime;
     this.lastSignedIn = user?.metadata.lastSignInTime;
+    if(this.id){
+      this.userService.getUserObject(this.id).subscribe(userData =>{
+        this.userObject = userData;
+      });
+    }
+    
   }
 
   async test() {

@@ -1,10 +1,19 @@
-<!-- <div>
+<div class="main">
+
   <h1>User Profile</h1>
+
+  <div class="profile-pic-container">
+    <img class="profile-pic" src="../../../assets/Default_pfp.svg.png">
+  </div>
+
+  <h2>Username: {{this.userObject?.username}}</h2>
   <p>Email: {{ userEmail }}</p>
   <p>ID: {{ id }}</p>
   <p>Creation Date: {{ creationDate }}</p>
   <p>Last Signed In Date: {{ lastSignedIn }}</p>
 
-  <ion-button (click)="signOut()">Sign Out</ion-button>
-  <ion-button (click)="test()"> Testing</ion-button>
+  <div class="button-container">
+    <ion-button (click)="signOut()">Sign Out</ion-button>
+    <ion-button (click)="test()"> Testing</ion-button>
+  </div>
 </div>
