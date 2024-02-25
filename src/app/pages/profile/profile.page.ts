@@ -30,6 +30,8 @@ export class ProfilePage implements OnInit {
     this.id = user?.uid;
     this.creationDate = user?.metadata.creationTime;
     this.lastSignedIn = user?.metadata.lastSignInTime;
+    console.log("Current User ID: " + this.id);
+    console.log("Current User Email: " + this.userEmail)
     if(this.id){
       this.userService.getUserObject(this.id).subscribe(userData =>{
         this.userObject = userData;
@@ -43,6 +45,7 @@ export class ProfilePage implements OnInit {
 
   async signOut() {
     await this.auth.signOut();
+    window.location.reload();
   }
 
 }

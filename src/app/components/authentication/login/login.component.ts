@@ -24,8 +24,8 @@ export class LoginComponent implements OnInit {
   }
 
   async login(): Promise<void> {
-    console.log(this.email);
-    console.log(this.password);
+    console.log("Login: " + this.email);
+    console.log("Login: " + this.password);
     let successLogin: boolean = await this.auth.loginUser(this.email,this.password);
     if(successLogin){
       console.log("Successful Login");
