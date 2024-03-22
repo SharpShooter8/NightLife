@@ -1,4 +1,7 @@
 <p>Maps Page</p>
 <div id="map-container">
-  <app-mapbox></app-mapbox>
+  <ion-button id="open-modal" expand="block">Open Sheet Modal</ion-button>
+
+  <app-mapbox-map (coords)="updateResults($event)"></app-mapbox-map>
+  <app-mapbox-result-modal [modalInput]="{coords: coords}"></app-mapbox-result-modal>
 </div>

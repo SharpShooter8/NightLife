@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { MapboxComponent } from './mapbox.component';
+import { FoursquareCardSmallComponent } from './foursquare-card-small.component';
 
-describe('MapboxComponent', () => {
-  let component: MapboxComponent;
-  let fixture: ComponentFixture<MapboxComponent>;
+describe('FoursquareCardSmallComponent', () => {
+  let component: FoursquareCardSmallComponent;
+  let fixture: ComponentFixture<FoursquareCardSmallComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MapboxComponent ],
+      declarations: [ FoursquareCardSmallComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MapboxComponent);
+    fixture = TestBed.createComponent(FoursquareCardSmallComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

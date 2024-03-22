@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { User, updateProfile } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';

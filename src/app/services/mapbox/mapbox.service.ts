@@ -45,12 +45,12 @@ export class MapboxService {
       this.map.resize();
       this.map.on("click", async (e) => {
         const features = this.map.queryRenderedFeatures(e.point);
-        console.log(features);
+        //console.log(features);
         if (this.map === undefined) { return; }
-        await this.createMarker(e.lngLat.lng, e.lngLat.lat);
+        this.createMarker(e.lngLat.lng, e.lngLat.lat);
         this.createPopup(e.lngLat.lng, e.lngLat.lat, features[0]?.id?.toString())
-        let value = await firstValueFrom(this.opencage.getDataFromLL(e.lngLat.lat, e.lngLat.lng));
-        console.log(value);
+        //let value = await firstValueFrom(this.opencage.getDataFromLL(e.lngLat.lat, e.lngLat.lng));
+        //console.log(value);
       });
     });
   }
@@ -67,7 +67,7 @@ export class MapboxService {
     this.map.setCenter({ lng: lng, lat: lat });
   }
 
-  async createMarker(lng: number, lat: number) {
+  createMarker(lng: number, lat: number) {
     new Marker().setLngLat({ lat: lat, lng: lng }).addTo(this.map);
     console.log(lat.toString() + "," + lng.toString());
   }
@@ -93,6 +93,11 @@ export class MapboxService {
     const geoCoderData = await firstValueFrom(this.getGeoCoderData(lat, lng));
     const combinedNames: string[] | undefined = geoCoderData?.features?.map(feature => `${feature.properties?.name} ${feature.properties?.place_formatted}`);
     return combinedNames ? combinedNames : [];
+  }
+
+  // Implement Later
+  async getCurrentGeoLocation(){
+
   }
 
 }

@@ -1,0 +1,7 @@
+<div id="container">
+  <ion-card (click)="getMoreDetail()">
+    <ion-img [src]="getPhotoString()"></ion-img>
+    <div class="card-title">{{placeData.name}}</div>
+    <div class="card-subtitle">{{placeData.location.formatted_address}}</div>
+  </ion-card>
+</div>
