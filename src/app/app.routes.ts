@@ -60,4 +60,9 @@ export const routes: Routes = [
     redirectTo: 'access-portal',
     pathMatch: 'full',
   },
+  {
+    path: 'profile-settings',
+    loadComponent: () => import('./pages/profile/profile-settings/profile-settings.page').then( m => m.ProfileSettingsPage)
+  },
+
 ];

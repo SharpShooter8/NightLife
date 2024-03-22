@@ -1,21 +1,27 @@
 <ion-content [fullscreen]="true">
-  <div class="main">
+  <div class="main" *ngIf="user$ | async as user">
 
     <h1>User Profile</h1>
   
     <div class="profile-pic-container">
-      <img class="profile-pic" src="../../../assets/Default_pfp.svg.png">
+      <img class="profile-pic" [src]="user.photoURL ??'../../../assets/Default_pfp.svg.png'">
+        <ion-button class="edit-pic-button" (click)="inputField.click()">
+          <ion-icon class="edit-icon" name="pencil-outline"></ion-icon>
+        </ion-button>
+
     </div>
+
+    <input #inputField type="file" hidden (change)="uploadImage($event, user)">
   
     <h2>Username: {{this.userObject?.username}}</h2>
-    <p>Email: {{ userEmail }}</p>
-    <p>ID: {{ id }}</p>
+    <p>Email: {{ user.email }}</p>
+    <p>ID: {{ user.uid }}</p>
     <p>Creation Date: {{ creationDate }}</p>
     <p>Last Signed In Date: {{ lastSignedIn }}</p>
   
     <div class="button-container">
       <ion-button (click)="signOut()">Sign Out</ion-button>
-      <ion-button (click)="test()"> Testing</ion-button>
+      <ion-button (click)="test()"> Settings</ion-button>
     </div>
   </div>
 </ion-content>

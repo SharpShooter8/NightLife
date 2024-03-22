@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { User, updateProfile } from '@angular/fire/auth';
+import { Auth, User, UserInfo, updateProfile } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, concatMap, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,7 @@ export class AuthenticationService {
   readonly loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   readonly currentUser: BehaviorSubject<firebase.default.User | null> = new BehaviorSubject<firebase.default.User | null>(null);
 
-  constructor(private ngFireAuth: AngularFireAuth, private router: Router) {
+  constructor(private ngFireAuth: AngularFireAuth, private router: Router, private auth: Auth) {
     this.authStatusListener();
   }
 
@@ -39,6 +39,17 @@ export class AuthenticationService {
       console.log(error);
       return null;
     }
+  }
+
+  updateProfile(profileData: Partial<UserInfo>): Observable<any>{
+    const user = this.auth.currentUser;
+    return of(user).pipe(
+      concatMap(user => {
+        if (!user) throw new Error("Not Authenticated");
+
+        return updateProfile(user, profileData)
+      })
+    )
   }
 
   async updateUserProfile(data: Profile): Promise<void> {
