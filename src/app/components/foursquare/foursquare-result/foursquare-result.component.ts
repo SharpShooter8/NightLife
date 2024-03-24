@@ -1,6 +1,6 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
-import { AutoCompletePlace, Place } from 'src/app/services/foursquare/foursquare.service';
+import { Place } from 'src/app/services/foursquare/foursquare.service';
 
 @Component({
   selector: 'app-foursquare-result',

@@ -4,76 +4,85 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { UserService } from 'src/app/services/database/user.service'
-import firebase from 'firebase/compat';
-import { ImageUploadService } from 'src/app/services/database/image-upload.service';
-import { HotToastService } from '@ngneat/hot-toast';
-import { getStorage } from '@angular/fire/storage';
-import { concatMap } from 'rxjs';
-import { Storage } from '@angular/fire/storage';
+import { ImageService } from 'src/app/services/storage/image.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
-  providers: [ImageUploadService, {
-    provide: Storage,
-    useFactory: () => {
-      const storage = getStorage();
-      return new Storage(storage);
-    }
-  }
-]
+  imports: [IonicModule, CommonModule, FormsModule]
+  // providers: [ImageUploadService, {
+  //   provide: Storage,
+  //   useFactory: () => {
+  //     const storage = getStorage();
+  //     return new Storage(storage);
+  //   }
+  // }
+// ]
 })
 export class ProfilePage implements OnInit {
 
 
-  // userEmail: string | null | undefined = "NA";
+  userEmail: string | null | undefined = "NA";
   creationDate: string | undefined = "NA";
   lastSignedIn: string | undefined = "NA";
   id: string | null | undefined = "NA";
-
-
-  user$ = this.auth.currentUser
+  userProfileImage: string | null | undefined;
 
   protected userService = inject(UserService);
   protected userObject!: any;
 
-  constructor(private auth: AuthenticationService, private imageUploadService: ImageUploadService, private toast: HotToastService) { }
-  
+  user: firebase.default.User | null = null;
 
-  ngOnInit() {
-    let user = this.auth.currentUser.getValue();
-    this.id = user?.uid;
-    this.creationDate = user?.metadata.creationTime;
-    this.lastSignedIn = user?.metadata.lastSignInTime;
-    if(this.id){
-      this.userService.getUserObject(this.id).subscribe(userData =>{
+  constructor(private auth: AuthenticationService, private image: ImageService) { }
+
+  async ngOnInit() {
+    this.user = this.auth.currentUser.getValue();
+    this.userEmail = this.user?.email;
+    this.id = this.user?.uid;
+    if (this.id != null) {
+      this.userProfileImage = await this.image.downloadProfileImage(this.id);
+    }
+    console.log(this.user?.photoURL);
+    this.creationDate = this.user?.metadata.creationTime;
+    this.lastSignedIn = this.user?.metadata.lastSignInTime;
+    console.log("Current User ID: " + this.id);
+    console.log("Current User Email: " + this.userEmail)
+    if (this.id) {
+      this.userService.getUserObject(this.id).subscribe(userData => {
         this.userObject = userData;
       });
     }
-    
+
   }
 
   async test() {
   }
 
-  uploadImage(event: any, user: firebase.User) {
-    this.imageUploadService.uploadImage(event.target.files[0], `images/profile/${user.uid}`).pipe(
-       this.toast.observe({
-        loading: 'Uploading profile image...',
-        success: 'Image uploaded successfully',
-        error: 'There was an error in uploading the image',
-       }),
-       concatMap((photoURL) => this.auth.updateProfile({photoURL}))
-    ).subscribe();
-    console.log(this.user$)
-  }
+  // uploadImage(event: any, user: firebase.User) {
+  //   this.imageUploadService.uploadImage(event.target.files[0], `images/profile/${user.uid}`).pipe(
+  //      this.toast.observe({
+  //       loading: 'Uploading profile image...',
+  //       success: 'Image uploaded successfully',
+  //       error: 'There was an error in uploading the image',
+  //      }),
+  //      concatMap((photoURL) => this.auth.updateProfile({photoURL}))
+  //   ).subscribe();
+  //   console.log(this.user$)
+  // }
 
   async signOut() {
     await this.auth.signOut();
     window.location.reload();
+  }
+
+  async uploadImage(event: any) {
+    if (this.user?.uid) {
+      this.image.uploadProfileImage(event.target.files[0], this.user?.uid);
+      this.auth.updateUserProfile({ photoURL: 'images/profile/' + this.user.uid });
+    }
   }
 
 }

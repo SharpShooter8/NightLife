@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FoursquareResultComponent } from '../foursquare-result/foursquare-result.component';
-import { AutoCompletePlace, FoursquareService, Place, PlaceSearchResult } from 'src/app/services/foursquare/foursquare.service';
+import { FoursquareService, Place } from 'src/app/services/foursquare/foursquare.service';
 import { firstValueFrom } from 'rxjs';
 import { CommonModule } from '@angular/common';
 
