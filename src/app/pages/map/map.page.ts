@@ -1,7 +1,6 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild } from '@angular/core';
+import { IonModal, IonicModule } from '@ionic/angular';
+import { ModalController } from '@ionic/angular/standalone';
 import { Coords, MapboxMapComponent } from 'src/app/components/mapbox/mapbox-map/mapbox-map.component';
 import { MapboxResultModalComponent } from 'src/app/components/mapbox/mapbox-result-modal/mapbox-result-modal.component';
 @Component({
@@ -9,22 +8,46 @@ import { MapboxResultModalComponent } from 'src/app/components/mapbox/mapbox-res
   templateUrl: './map.page.html',
   styleUrls: ['./map.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, MapboxMapComponent, MapboxResultModalComponent],
+  imports: [IonicModule, MapboxMapComponent, MapboxResultModalComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MapPage implements OnInit {
 
   coords!: Coords;
+  modal: HTMLIonModalElement | null = null;
 
-  constructor() { }
+  constructor(private modalCtrl: ModalController) { }
 
-  ngOnInit() {
+  async ngOnInit() {
     console.log("Map Page");
   }
 
-  updateResults(coords: Coords){
+  async updateResults(coords: Coords) {
     this.coords = coords;
+    await this.openModal();
+  }
+
+  async openModal() {
+    if (this.modal) {
+      await this.modal.dismiss(null, 'close');
+    }
+
+    this.modal = await this.modalCtrl.create({
+      component: MapboxResultModalComponent,
+      componentProps: {
+        modalInput: {
+          coords: this.coords,
+        },
+      },
+      initialBreakpoint: .4,
+      breakpoints: [0, .4, .8],
+      backdropBreakpoint: .75,
+    });
+
+    this.modal.present();
   }
 
 }
+
+
 

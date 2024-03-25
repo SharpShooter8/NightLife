@@ -1,9 +1,16 @@
 <ion-content [fullscreen]="true">
-  <app-foursquare-lookup></app-foursquare-lookup>
-  <app-foursquare-swipe [size]="'large'"></app-foursquare-swipe>
-  <app-foursquare-swipe [size]="'small'"></app-foursquare-swipe>
-  <app-foursquare-swipe [size]="'medium'"></app-foursquare-swipe>
-  <app-foursquare-swipe [size]="'medium'"></app-foursquare-swipe>
-  <app-foursquare-swipe [size]="'small'"></app-foursquare-swipe>
-  <app-foursquare-swipe [size]="'medium'"></app-foursquare-swipe>
+  <ion-searchbar [debounce]="1000" (ionInput)="handleInput($event.target.value)"></ion-searchbar>
+  @if(isSearching){
+    <ion-row>
+      @for(searchResult of searchResults; track searchResult) {
+        <ion-col size="5.5">
+          <app-foursquare-card-medium [place]="searchResult"></app-foursquare-card-medium>
+        </ion-col>
+      }
+    </ion-row>
+  } @else {
+    @for(places of recommendations; track places){
+      <app-foursquare-swipe [places]="places"></app-foursquare-swipe>
+    }
+  }
 </ion-content>

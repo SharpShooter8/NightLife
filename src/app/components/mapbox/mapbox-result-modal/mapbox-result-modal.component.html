@@ -1,20 +1,51 @@
-<div id="container">
-  <ion-modal #modal trigger="open-modal" [isOpen]="true" [initialBreakpoint]="0.40" [breakpoints]="[0, 0.40, 0.5, 0.75]"
-    [backdropDismiss]="false" [backdropBreakpoint]="0.5">
+<ion-content class="ion-padding" [style.--background]="backgroundcolor">
+  @if(isSelected){
+  <ion-text>{{selectedPlace?.name}}</ion-text>
+  <ion-text>{{selectedPlace?.description}}</ion-text>
+  <ion-text>{{selectedPlace?.rating}}</ion-text>
+  <ion-text>{{selectedPlace?.location?.formatted_address}}</ion-text>
+  <ion-text>{{selectedPlace?.hours?.open_now}}</ion-text>
+  } @else {
 
-    <ng-template>
-      <ion-content class="ion-padding">
-        <!-- <ion-searchbar placeholder="Search" (click)="modal.setCurrentBreakpoint(0.75)"></ion-searchbar> -->
-        <swiper-container slides-per-view="2" loop="true">
-          @for(place of places; track place){
-          <swiper-slide>
-            <app-mapbox-result-card [placeData]="place"
-              (moreDetail)="modal.setCurrentBreakpoint(0.50)"></app-mapbox-result-card>
-          </swiper-slide>
-          }
-        </swiper-container>
-      </ion-content>
-    </ng-template>
+  <swiper-container slides-per-view="2" loop="true">
+    @if(places.length < 1){
+      <swiper-slide>
+        <ion-card>
+          <ion-card-header>
+            <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+          </ion-card-header>
+          <ion-card-subtitle>
+            <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+          </ion-card-subtitle>
+          <ion-card-content>
+            <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+          </ion-card-content>
+        </ion-card>
+      </swiper-slide>
+      <swiper-slide>
+        <ion-card>
+          <ion-card-header>
+            <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+          </ion-card-header>
+          <ion-card-subtitle>
+            <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+          </ion-card-subtitle>
+          <ion-card-content>
+            <ion-skeleton-text [animated]="true" style="width: 80px"></ion-skeleton-text>
+          </ion-card-content>
+        </ion-card>
+      </swiper-slide>
+    } @else {
+      @for(place of places; track place) {
+      <swiper-slide>
+        <app-mapbox-result-card [placeData]="place" (click)="clickOnResult(place)">
+        </app-mapbox-result-card>
+      </swiper-slide>
+      }
+    }
+  </swiper-container>
 
-  </ion-modal>
-</div>
+
+  }
+
+</ion-content>

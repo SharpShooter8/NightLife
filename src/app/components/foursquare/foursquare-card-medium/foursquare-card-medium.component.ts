@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
+import { Place } from 'src/app/services/foursquare/foursquare.service';
 
 @Component({
   selector: 'app-foursquare-card-medium',
@@ -10,7 +11,7 @@ import { IonicModule } from '@ionic/angular';
 })
 export class FoursquareCardMediumComponent  implements OnInit {
 
-  @Input() place: string = "";
+  @Input() place: Place | null = null;
 
   constructor() { }
 
