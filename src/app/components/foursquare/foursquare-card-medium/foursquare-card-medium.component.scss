@@ -1,8 +1,30 @@
-ion-card{
-  width:42vw;
-  height: 42vw;
+.pill-rectangle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 20px;
+  padding: 5px 10px;
+  font-size: small;
+}
+
+.pill-text {
+  font-weight: bold;
+}
+
+ion-card {
+  background: linear-gradient(45deg, #6b0f9c, #b91372); /* Gradient background with dark purples and pinks */
+  color: #fff;
+  border-radius: 20px;
+  height: 70vw;
+  width: 45vw;
+}
+
+.star{
+  color: yellow;
 }
 
 ion-card-title{
-  font-size: small;
+  font-size: medium;
 }

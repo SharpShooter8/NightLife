@@ -1,0 +1,56 @@
+<ion-content class="ion-padding">
+  <ion-grid>
+    <ion-row>
+      <ion-col size="4" class="image-col">
+        <swiper-container [loop]="true">
+          @for(photo of place?.photos; track photo){
+          <swiper-slide>
+            <ion-img [src]="photo.prefix + '700x1000' + photo.suffix" class="image"/>
+          </swiper-slide>
+          } @empty {
+            <ion-img src="https://ionicframework.com/docs/img/demos/card-media.png" class="image"/>
+          }
+        </swiper-container>
+      </ion-col>
+      <ion-col size="8" class="info-col">
+        <div class="info">
+          <ion-item>
+            <ion-text>{{place?.name}}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-text>Price: {{getPrice()}}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-text>Hours: {{getHours()}}</ion-text>
+          </ion-item>
+          <ion-item>
+            <ion-text>Location: {{place?.location?.formatted_address}}</ion-text>
+          </ion-item>
+        </div>
+      </ion-col>
+    </ion-row>
+    <ion-row class="review-row">
+      <ion-col>
+        <div class="review">
+          <swiper-container [loop]="true">
+            @for(tip of place?.tips; track tip){
+            <swiper-slide>
+              <ion-item>
+                <ion-text>Review</ion-text>
+                <ion-text>{{tip.created_at}}</ion-text>
+              </ion-item>
+              <ion-item>
+                <ion-text>{{tip.text}}</ion-text>
+              </ion-item>
+            </swiper-slide>
+            } @empty {
+              <ion-item>
+                <ion-text>No Reviews</ion-text>
+              </ion-item>
+            }
+          </swiper-container>
+        </div>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

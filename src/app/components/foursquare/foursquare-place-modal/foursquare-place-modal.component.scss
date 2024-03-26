@@ -1,0 +1,40 @@
+ion-content{
+  --background: gray;
+}
+
+.image-col {
+  flex: 0 0 40%;
+}
+
+.info-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-left: 10px;
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  border-radius: 10px; /* Example border radius */
+}
+
+.info {
+  width: 100%;
+}
+
+
+.review {
+  background-color: #f5f5f5; /* Example background color */
+  border-radius: 10px; /* Example border radius */
+  padding: 20px; /* Adjust according to your design */
+}
+
+ion-text {
+  color:black;
+}
+
+ion-item{
+  --background: transparent !important;
+}

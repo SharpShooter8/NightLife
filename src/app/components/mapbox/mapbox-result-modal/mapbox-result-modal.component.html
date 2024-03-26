@@ -6,7 +6,6 @@
   <ion-text>{{selectedPlace?.location?.formatted_address}}</ion-text>
   <ion-text>{{selectedPlace?.hours?.open_now}}</ion-text>
   } @else {
-
   <swiper-container slides-per-view="2" loop="true">
     @if(places.length < 1){
       <swiper-slide>
@@ -44,8 +43,6 @@
       }
     }
   </swiper-container>
-
-
   }
 
 </ion-content>

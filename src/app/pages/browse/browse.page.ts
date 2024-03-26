@@ -8,6 +8,8 @@ import { firstValueFrom } from 'rxjs';
 import { FoursquareCardSmallComponent } from 'src/app/components/foursquare/foursquare-card-small/foursquare-card-small.component';
 import { FoursquareCardMediumComponent } from 'src/app/components/foursquare/foursquare-card-medium/foursquare-card-medium.component';
 import { FoursquareCardLargeComponent } from 'src/app/components/foursquare/foursquare-card-large/foursquare-card-large.component';
+import { ModalController } from '@ionic/angular/standalone';
+import { FoursquarePlaceModalComponent } from 'src/app/components/foursquare/foursquare-place-modal/foursquare-place-modal.component';
 
 @Component({
   selector: 'app-browse',
@@ -24,7 +26,9 @@ export class BrowsePage implements OnInit {
 
   recommendations: Place[][] | [][] = [[]];
 
-  constructor(private foursquare: FoursquareService) { }
+  modal: HTMLIonModalElement | null = null;
+
+  constructor(private modalCtrl: ModalController, private foursquare: FoursquareService) { }
 
   ngOnInit() {
     console.log("Browse Page Created");
@@ -50,7 +54,7 @@ export class BrowsePage implements OnInit {
             ll: '30.26618380749575,-97.73357972175239',
             sort: 'DISTANCE',
             limit: 4,
-            fields: "distance,hours,rating,location,photos,name"
+            fields: "distance,hours,rating,location,photos,name,price,tips"
           })
         );
         if (data.results.length > 1) {
@@ -87,7 +91,7 @@ export class BrowsePage implements OnInit {
             ll: '30.26618380749575,-97.73357972175239',
             sort: 'DISTANCE',
             limit: 10,
-            fields: "distance,hours,rating,location,photos,name"
+            fields: "distance,hours,rating,location,photos,name,price,tips"
           })
         );
         if (data.results.length > 1) {
@@ -104,6 +108,23 @@ export class BrowsePage implements OnInit {
     if (retryCount === 10) {
       this.searchResults = [];
     }
+  }
+
+  async openModal($event: Place){
+    if (this.modal) {
+      await this.modal.dismiss(null, 'close');
+    }
+
+    this.modal = await this.modalCtrl.create({
+      component: FoursquarePlaceModalComponent,
+      componentProps: {
+        place: $event,
+      },
+      initialBreakpoint: .5,
+      breakpoints: [0,.5],
+    });
+
+    await this.modal.present();
   }
 
 }

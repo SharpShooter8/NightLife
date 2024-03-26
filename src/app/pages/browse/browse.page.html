@@ -4,13 +4,13 @@
     <ion-row>
       @for(searchResult of searchResults; track searchResult) {
         <ion-col size="5.5">
-          <app-foursquare-card-medium [place]="searchResult"></app-foursquare-card-medium>
+          <app-foursquare-card-medium [place]="searchResult" (click)="openModal(searchResult)"></app-foursquare-card-medium>
         </ion-col>
       }
     </ion-row>
   } @else {
     @for(places of recommendations; track places){
-      <app-foursquare-swipe [places]="places"></app-foursquare-swipe>
+      <app-foursquare-swipe [places]="places" (moreDetail)="openModal($event)"></app-foursquare-swipe>
     }
   }
 </ion-content>

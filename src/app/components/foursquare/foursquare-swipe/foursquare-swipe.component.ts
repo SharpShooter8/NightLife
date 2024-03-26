@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Input, OnInit } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { FoursquareCardSmallComponent } from '../foursquare-card-small/foursquare-card-small.component';
 import { FoursquareCardMediumComponent } from '../foursquare-card-medium/foursquare-card-medium.component';
@@ -11,13 +11,13 @@ import { Place } from 'src/app/services/foursquare/foursquare.service';
   styleUrls: ['./foursquare-swipe.component.scss'],
   standalone: true,
   imports: [IonicModule, FoursquareCardSmallComponent, FoursquareCardMediumComponent, FoursquareCardLargeComponent],
-  schemas:[CUSTOM_ELEMENTS_SCHEMA]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class FoursquareSwipeComponent  implements OnInit {
+export class FoursquareSwipeComponent implements OnInit {
 
   @Input() size: string = this.getRandomSize();
-
   @Input() places: Place[] = [];
+  @Output() moreDetail: EventEmitter<Place> = new EventEmitter();
 
   constructor() { }
 
@@ -30,7 +30,7 @@ export class FoursquareSwipeComponent  implements OnInit {
     const sizes = ['small', 'medium', 'large'];
     const randomIndex = Math.floor(Math.random() * sizes.length);
     return sizes[randomIndex];
-}
+  }
 
 }
 

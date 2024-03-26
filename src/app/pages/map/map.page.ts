@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit, ViewChild } from '@angular/core';
-import { IonModal, IonicModule } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { ModalController } from '@ionic/angular/standalone';
 import { Coords, MapboxMapComponent } from 'src/app/components/mapbox/mapbox-map/mapbox-map.component';
 import { MapboxResultModalComponent } from 'src/app/components/mapbox/mapbox-result-modal/mapbox-result-modal.component';
@@ -41,7 +41,7 @@ export class MapPage implements OnInit {
       },
       initialBreakpoint: .4,
       breakpoints: [0, .4, .8],
-      backdropBreakpoint: .75,
+      backdropBreakpoint: .5,
     });
 
     this.modal.present();

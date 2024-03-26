@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { FoursquareResultComponent } from './foursquare-result.component';
+import { FoursquarePlaceModalComponent } from './foursquare-place-modal.component';
 
-describe('FoursquareResultComponent', () => {
-  let component: FoursquareResultComponent;
-  let fixture: ComponentFixture<FoursquareResultComponent>;
+describe('FoursquarePlaceModalComponent', () => {
+  let component: FoursquarePlaceModalComponent;
+  let fixture: ComponentFixture<FoursquarePlaceModalComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ FoursquareResultComponent ],
+      declarations: [ FoursquarePlaceModalComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(FoursquareResultComponent);
+    fixture = TestBed.createComponent(FoursquarePlaceModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));
