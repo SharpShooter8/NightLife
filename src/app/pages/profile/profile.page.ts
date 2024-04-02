@@ -5,22 +5,17 @@ import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { UserService } from 'src/app/services/database/user.service'
 import { ImageService } from 'src/app/services/storage/image.service';
+import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { environment } from 'src/environments/environment';
+
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
-  // providers: [ImageUploadService, {
-  //   provide: Storage,
-  //   useFactory: () => {
-  //     const storage = getStorage();
-  //     return new Storage(storage);
-  //   }
-  // }
-// ]
+  imports: [IonicModule, CommonModule, FormsModule ]
+
 })
 export class ProfilePage implements OnInit {
 
@@ -30,13 +25,15 @@ export class ProfilePage implements OnInit {
   lastSignedIn: string | undefined = "NA";
   id: string | null | undefined = "NA";
   userProfileImage: string | null | undefined;
+  userBio: string | null | undefined;
 
   protected userService = inject(UserService);
   protected userObject!: any;
 
   user: firebase.default.User | null = null;
 
-  constructor(private auth: AuthenticationService, private image: ImageService) { }
+  constructor(private auth: AuthenticationService, private image: ImageService, private firestore: 
+    AngularFirestore) { }
 
   async ngOnInit() {
     this.user = this.auth.currentUser.getValue();
@@ -45,33 +42,23 @@ export class ProfilePage implements OnInit {
     if (this.id != null) {
       this.userProfileImage = await this.image.downloadProfileImage(this.id);
     }
-    console.log(this.user?.photoURL);
     this.creationDate = this.user?.metadata.creationTime;
     this.lastSignedIn = this.user?.metadata.lastSignInTime;
-    console.log("Current User ID: " + this.id);
-    console.log("Current User Email: " + this.userEmail)
+    
     if (this.id) {
       this.userService.getUserObject(this.id).subscribe(userData => {
         this.userObject = userData;
+        this.userBio = userData.profileBio;
       });
     }
 
+
+
   }
 
-  async test() {
-  }
+  async editForm() {
 
-  // uploadImage(event: any, user: firebase.User) {
-  //   this.imageUploadService.uploadImage(event.target.files[0], `images/profile/${user.uid}`).pipe(
-  //      this.toast.observe({
-  //       loading: 'Uploading profile image...',
-  //       success: 'Image uploaded successfully',
-  //       error: 'There was an error in uploading the image',
-  //      }),
-  //      concatMap((photoURL) => this.auth.updateProfile({photoURL}))
-  //   ).subscribe();
-  //   console.log(this.user$)
-  // }
+  }
 
   async signOut() {
     await this.auth.signOut();
@@ -82,6 +69,7 @@ export class ProfilePage implements OnInit {
     if (this.user?.uid) {
       this.image.uploadProfileImage(event.target.files[0], this.user?.uid);
       this.auth.updateUserProfile({ photoURL: 'images/profile/' + this.user.uid });
+
     }
   }
 

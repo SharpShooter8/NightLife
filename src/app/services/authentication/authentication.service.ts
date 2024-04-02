@@ -41,18 +41,9 @@ export class AuthenticationService {
     }
   }
 
-  updateProfile(profileData: Partial<UserInfo>): Observable<any>{
-    const user = this.auth.currentUser;
-    return of(user).pipe(
-      concatMap(user => {
-        if (!user) throw new Error("Not Authenticated");
-
-        return updateProfile(user, profileData)
-      })
-    )
-  }
 
   async updateUserProfile(data: Profile): Promise<void> {
+    console.log(data)
     return (await this.ngFireAuth.currentUser)?.updateProfile(data);
   }
 

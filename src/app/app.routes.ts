@@ -7,6 +7,7 @@ import { MapPage } from './pages/map/map.page';
 import { DashboardPage } from './pages/dashboard/dashboard.page';
 import { BrowsePage } from './pages/browse/browse.page';
 import { SocialPage } from './pages/social/social.page';
+import { ProfileSettingsPage } from './pages/profile/profile-settings/profile-settings.page';
 
 const redirectUnauthorizedToLogin = () => redirectUnauthorizedTo(['login']);
 const redirectLoggedInToHome = () => redirectLoggedInTo(['home/dashboard']);
@@ -59,10 +60,6 @@ export const routes: Routes = [
     path: '**',
     redirectTo: 'access-portal',
     pathMatch: 'full',
-  },
-  {
-    path: 'profile-settings',
-    loadComponent: () => import('./pages/profile/profile-settings/profile-settings.page').then( m => m.ProfileSettingsPage)
-  },
+  }
 
 ];

@@ -13,15 +13,18 @@
 
     <input #inputField type="file" hidden (change)="uploadImage($event)">
   
-    <h2>Username: {{this.userObject?.username}}</h2>
+    <p>Username: {{this.userObject?.username}}</p>
     <p>Email: {{ userEmail }}</p>
-    <p>ID: {{ id }}</p>
-    <p>Creation Date: {{ creationDate }}</p>
-    <p>Last Signed In Date: {{ lastSignedIn }}</p>
+    <p>Bio: {{userBio ?? 'Add info'}} </p>
+
+    <p>Location: </p>
+
+    <p>Socials: </p>
+
 
     <div class="button-container">
       <ion-button (click)="signOut()">Sign Out</ion-button>
-      <ion-button (click)="test()"> Settings</ion-button>
+      <ion-button (click)="editForm()"> Edit Profile</ion-button>
     </div>
   </div>
 </ion-content>
