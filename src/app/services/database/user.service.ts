@@ -19,6 +19,7 @@ export class UserService {
       return await this.userRef.doc(uid).set({
         username: username,
         friends: [],
+        settings: {accountPrivate: true, locationAllowed: true},
       }, { merge: true });
     } catch (error) {
       console.error("Error in createUser:", error); // Log any errors
@@ -197,13 +198,19 @@ export class UserService {
     }
   }
 
-
 }
 
 export interface UserData {
   username: FieldValue | string;
   friends?: FieldValue | Friend[];
+  settings: FieldValue | Settings;
 }
+
+export interface Settings{
+  accountPrivate: boolean,
+  locationAllowed: boolean
+}
+
 export enum FriendStatus {
   Sent = "sent",
   Pending = "pending",

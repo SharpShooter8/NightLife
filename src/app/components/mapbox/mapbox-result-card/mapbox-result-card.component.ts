@@ -12,16 +12,10 @@ import { Place } from 'src/app/services/foursquare/foursquare.service';
 export class MapboxResultCardComponent  implements OnInit {
 
   @Input() placeData!: Place;
-  @Output() moreDetail: EventEmitter<any> = new EventEmitter();
-
   constructor() { }
 
   ngOnInit() {
     let test = 0;
-  }
-
-  getMoreDetail(){
-    this.moreDetail.emit();
   }
 
   getPhotoString(): string{

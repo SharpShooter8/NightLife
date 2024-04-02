@@ -3,7 +3,7 @@
     <swiper-container [loop]="true" [slidesPerView]="3">
       @for(place of places; track place){
       <swiper-slide>
-        <app-foursquare-card-small [place]=place></app-foursquare-card-small>
+        <app-foursquare-card-small [place]="place" (click)="moreDetail.emit(place)"></app-foursquare-card-small>
       </swiper-slide>
       }
     </swiper-container>
@@ -12,7 +12,7 @@
     <swiper-container [loop]="true" [slidesPerView]="2">
       @for(place of places; track place){
       <swiper-slide>
-        <app-foursquare-card-medium [place]=place></app-foursquare-card-medium>
+        <app-foursquare-card-medium [place]="place" (click)="moreDetail.emit(place)"></app-foursquare-card-medium>
       </swiper-slide>
       }
     </swiper-container>
@@ -21,7 +21,7 @@
     <swiper-container [loop]="true" [slidesPerView]="1">
       @for(place of places; track place){
       <swiper-slide>
-        <app-foursquare-card-large [place]=place></app-foursquare-card-large>
+        <app-foursquare-card-large [place]="place" (click)="moreDetail.emit(place)"></app-foursquare-card-large>
       </swiper-slide>
       }
     </swiper-container>
