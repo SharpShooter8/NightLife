@@ -5,22 +5,25 @@ import { FieldValue } from '@angular/fire/firestore';
 @Injectable({
   providedIn: 'root'
 })
-export class FriendService {
+export class FriendshipService {
 
   private friendRef: AngularFirestoreCollection<FriendData>;
 
   constructor(private db: AngularFirestore) {
-    this.friendRef = this.db.collection<FriendData>('Friends');
+    this.friendRef = this.db.collection<FriendData>('Friendships');
   }
 
   async createFriendship(user1: string, user2: string): Promise<void> {
     try {
       const friendshipQuery = await this.friendRef.ref
         .where('user1', 'in', [user1, user2])
+        .get();
+
+      const friendshipQuery2 = await this.friendRef.ref
         .where('user2', 'in', [user1, user2])
         .get();
 
-      if (!friendshipQuery.empty) {
+      if (!friendshipQuery.empty && !friendshipQuery2.empty) {
         throw new Error('Friendship already exists');
       }
 
@@ -40,11 +43,14 @@ export class FriendService {
     try {
       const friendshipQuery = await this.friendRef.ref
         .where('user1', 'in', [user1, user2])
+        .get();
+
+      const friendshipQuery2 = await this.friendRef.ref
         .where('user2', 'in', [user1, user2])
         .get();
 
-      if (friendshipQuery.empty) {
-        throw new Error('Friendship does not exist');
+      if (friendshipQuery.empty && friendshipQuery2.empty) {
+        throw new Error('Friendship does not exists');
       }
 
       const batch = this.db.firestore.batch();

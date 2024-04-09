@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
-import { FriendService } from 'src/app/services/database/friend.service';
+import { FriendshipService } from 'src/app/services/database/friendship.service';
 import { UsernameService } from 'src/app/services/database/username.service';
 
 @Component({
@@ -14,13 +14,16 @@ import { UsernameService } from 'src/app/services/database/username.service';
 })
 export class FriendsComponent implements OnInit {
 
-  friendsList: any = [];
+  friendsList: string[] = [];
   newFriend: string = "";
 
-  constructor(private usernameData: UsernameService, private friend: FriendService, private auth: AuthenticationService) {
+  uid: string = "";
+
+  constructor(private usernameData: UsernameService, private friendship: FriendshipService, private auth: AuthenticationService) {
     this.auth.currentUser.subscribe(user => {
       if (user) {
-        this.getFriends();
+        this.getFriends(user.uid);
+        this.uid = user.uid;
       }
     })
   }
@@ -30,11 +33,16 @@ export class FriendsComponent implements OnInit {
   }
 
   async addFriend() {
-
+    const friendUID = await this.usernameData.getUID(this.newFriend) as string;
+    this.friendship.createFriendship(this.uid, friendUID);
   }
 
-  async getFriends() {
-
+  async getFriends(uid: string) {
+    const friends = await this.friendship.getFriends(uid);
+    console.log(friends);
+    friends.forEach(friend => {
+      this.friendsList.push(friend);
+    });
   }
 
   async removeFriend(friendUID: string) {

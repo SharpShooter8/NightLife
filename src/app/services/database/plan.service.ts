@@ -248,35 +248,6 @@ export class PlanService {
     }
   }
 
-  private async getRole(uid: string, planID: string): Promise<Role> {
-    try {
-      const planDocSnapshot = await this.planRef.doc(planID).ref.get();
-      if (!planDocSnapshot.exists) {
-        throw new Error(`Plan document with ID ${planID} does not exist`);
-      }
-
-      const members = planDocSnapshot.data()?.members as Member[] || [];
-      const memberIndex = members.findIndex(member => member.uid === uid);
-
-      if (memberIndex === -1) {
-        throw new Error(`Not a member`);
-      }
-
-      return members[memberIndex].role as Role;
-    } catch (error) {
-      throw new Error('Failed to get role: ' + error);
-    }
-  }
-
-  private async hasPermission(uid: string, planID: string, requiredRole: Role): Promise<boolean> {
-    try {
-      const userRole = await this.getRole(planID, uid);
-      return rolePrecedence[userRole] <= rolePrecedence[requiredRole];
-    } catch (error) {
-      throw new Error('Failed to check permission: ' + error);
-    }
-  }
-
   async addLocation(uid: string, planID: string, location: Location, orderNum: number): Promise<void> {
     try {
       if (!(await this.hasPermission(planID, uid, Role.Planner))) {
@@ -379,10 +350,6 @@ export class PlanService {
     }
   }
 
-  private organizeLocations(locations: PlaceLocation[]): PlaceLocation[] {
-    return locations.map((location, index) => ({ ...location, order_num: index }));
-  }
-
   async updateLocationStartTime(uid: string, planID: string, locationID: string, newStartTime: string): Promise<void> {
     try {
       if (!(await this.hasPermission(planID, uid, Role.Planner))) {
@@ -441,6 +408,39 @@ export class PlanService {
     } catch (error) {
       throw new Error('Failed to update location end time: ' + error);
     }
+  }
+
+  private async getRole(uid: string, planID: string): Promise<Role> {
+    try {
+      const planDocSnapshot = await this.planRef.doc(planID).ref.get();
+      if (!planDocSnapshot.exists) {
+        throw new Error(`Plan document with ID ${planID} does not exist`);
+      }
+
+      const members = planDocSnapshot.data()?.members as Member[] || [];
+      const memberIndex = members.findIndex(member => member.uid === uid);
+
+      if (memberIndex === -1) {
+        throw new Error(`Not a member`);
+      }
+
+      return members[memberIndex].role as Role;
+    } catch (error) {
+      throw new Error('Failed to get role: ' + error);
+    }
+  }
+
+  private async hasPermission(uid: string, planID: string, requiredRole: Role): Promise<boolean> {
+    try {
+      const userRole = await this.getRole(planID, uid);
+      return rolePrecedence[userRole] <= rolePrecedence[requiredRole];
+    } catch (error) {
+      throw new Error('Failed to check permission: ' + error);
+    }
+  }
+
+  private organizeLocations(locations: PlaceLocation[]): PlaceLocation[] {
+    return locations.map((location, index) => ({ ...location, order_num: index }));
   }
 }
 

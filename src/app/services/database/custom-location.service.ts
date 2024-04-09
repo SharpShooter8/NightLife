@@ -138,13 +138,10 @@ export class CustomLocationService {
     }
   }
 
-  async getUserLocations(uid: string): Promise<UserLocation[]> {
+  async getUserLocations(uid: string): Promise<string[]> {
     try {
-      const querySnapshot = await this.customLocationRef.ref.where('owner', '==', uid).get();
-      const userLocations: UserLocation[] = [];
-      querySnapshot.forEach(doc => {
-        userLocations.push({ id: doc.id, location: (doc.data() as CustomLocationData) });
-      });
+      const locationSnapshot = await this.customLocationRef.ref.where('owner', '==', uid).get();
+      const userLocations = locationSnapshot.docs.map(doc => doc.id);
       return userLocations;
     } catch (error) {
       throw new Error('Failed to get user locations: ' + error);
@@ -211,7 +208,3 @@ export enum Price {
   Expensive = 'expensive'
 }
 
-export interface UserLocation {
-  id: string,
-  location: CustomLocationData
-}
