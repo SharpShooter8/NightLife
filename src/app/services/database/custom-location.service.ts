@@ -30,12 +30,12 @@ export class CustomLocationService {
     }
   }
 
-  async deleteLocation(uid: string, locationID: string): Promise<void> {
+  async removeLocation(uid: string, locationID: string): Promise<void> {
     try {
       await this.checkAccess(uid, locationID);
       await this.customLocationRef.doc(locationID).delete();
     } catch (error) {
-      throw new Error('Failed to delete location: ' + error);
+      throw new Error('Failed to remove location: ' + error);
     }
   }
 
@@ -138,13 +138,12 @@ export class CustomLocationService {
     }
   }
 
-  async getUserLocations(uid: string): Promise<CustomLocationData[]> {
+  async getUserLocations(uid: string): Promise<UserLocation[]> {
     try {
       const querySnapshot = await this.customLocationRef.ref.where('owner', '==', uid).get();
-      const userLocations: CustomLocationData[] = [];
+      const userLocations: UserLocation[] = [];
       querySnapshot.forEach(doc => {
-        const locationData = doc.data() as CustomLocationData;
-        userLocations.push(locationData);
+        userLocations.push({ id: doc.id, location: (doc.data() as CustomLocationData) });
       });
       return userLocations;
     } catch (error) {
@@ -210,4 +209,9 @@ export enum Price {
   Affordable = 'affordable',
   Pricey = 'pricey',
   Expensive = 'expensive'
+}
+
+export interface UserLocation {
+  id: string,
+  location: CustomLocationData
 }

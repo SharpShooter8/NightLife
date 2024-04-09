@@ -13,7 +13,7 @@ export class UsernameService {
     this.usernameRef = this.db.collection<UsernameData>('Usernames');
   }
 
-  async createUsername(username: string, uid: string): Promise<void> {
+  async createUsername(uid: string, username: string): Promise<void> {
     try {
       const usernameExists = await this.usernameExists(username);
       if (usernameExists) {
@@ -25,7 +25,7 @@ export class UsernameService {
     }
   }
 
-  async deleteUsername(username: string): Promise<void> {
+  async removeUsername(username: string): Promise<void> {
     try {
       const exists = await this.usernameExists(username);
       if (!exists) {
@@ -33,7 +33,7 @@ export class UsernameService {
       }
       await this.usernameRef.doc(username).delete();
     } catch (error) {
-      throw new Error('Failed to delete username: ' + error);
+      throw new Error('Failed to remove username: ' + error);
     }
   }
 

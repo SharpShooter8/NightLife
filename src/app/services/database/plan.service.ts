@@ -36,15 +36,15 @@ export class PlanService {
     }
   }
 
-  async deletePlan(uid: string, planID: string): Promise<void> {
+  async removePlan(uid: string, planID: string): Promise<void> {
     try {
       if (!(await this.hasPermission(planID, uid, Role.Owner))) {
-        throw new Error('You do not have permission to delete this plan');
+        throw new Error('You do not have permission to remove this plan');
       }
 
       await this.planRef.doc(planID).delete();
     } catch (error) {
-      throw new Error('Failed to delete plan: ' + error);
+      throw new Error('Failed to remove plan: ' + error);
     }
   }
 
@@ -115,37 +115,62 @@ export class PlanService {
     }
   }
 
-  async addMember(uid: string, planID: string, newUID: string, role: Role): Promise<void> {
+  async addMember(uid: string, planID: string, newUID: string): Promise<void> {
     try {
-      if (!(await this.hasPermission(planID, uid, Role.Owner))) {
+      if (!(await this.hasPermission(planID, uid, Role.CoOwner))) {
         throw new Error('You do not have permission to add a member to this plan');
       }
 
-      await this.planRef.doc(planID).update({ members: arrayUnion({ uid: newUID, role }) });
+      await this.planRef.doc(planID).update({ members: arrayUnion({ uid: newUID, role: Role.Invited }) });
     } catch (error) {
       throw new Error('Failed to add member: ' + error);
     }
   }
 
-  async deleteMember(uid: string, planID: string, deletedUID: string): Promise<void> {
+  async removeMember(uid: string, planID: string, targetUID: string): Promise<void> {
     try {
-      if (!(await this.hasPermission(planID, uid, Role.Owner))) {
-        throw new Error('You do not have permission to delete a member from this plan');
+      if (!(await this.hasPermission(planID, uid, Role.CoOwner))) {
+        throw new Error('You do not have permission to remove a member from this plan');
       }
 
-      await this.planRef.doc(planID).update({ members: arrayRemove({ uid: deletedUID }) });
+      await this.planRef.doc(planID).update({ members: arrayRemove({ uid: targetUID }) });
     } catch (error) {
-      throw new Error('Failed to delete member: ' + error);
+      throw new Error('Failed to remove member: ' + error);
+    }
+  }
+
+  async acceptPlanInvite(uid: string, planID: string) {
+    try {
+      await this.db.firestore.runTransaction(async (transaction) => {
+        const planDocRef = this.planRef.doc(planID).ref;
+        const planDocSnapshot = await transaction.get(planDocRef);
+        if (!planDocSnapshot.exists) {
+          throw new Error(`Plan document with ID ${planID} does not exist`);
+        }
+
+        const members = planDocSnapshot.data()?.members as Member[] || [];
+        const memberIndex = members.findIndex(member => member.uid === uid);
+        if (memberIndex === -1 || members[memberIndex].role !== Role.Invited) {
+          throw new Error(`Invited memeber with UID ${uid} does not exist in this plan`);
+        }
+
+        const updatedMember = { ...members[memberIndex], role: Role.Attendee };
+
+        transaction.update(planDocRef, { members: arrayRemove(members[memberIndex]) });
+        transaction.update(planDocRef, { members: arrayUnion(updatedMember) });
+      });
+    } catch (error) {
+      throw new Error('Failed to accept plan invite: ' + error);
     }
   }
 
   async updateMemberRole(uid: string, planID: string, memberUID: string, newRole: Role): Promise<void> {
     try {
-      await this.db.firestore.runTransaction(async (transaction) => {
-        if (!(await this.hasPermission(planID, uid, Role.Owner))) {
-          throw new Error('You do not have permission to update the role of members in this plan');
-        }
+      if (!(await this.hasPermission(planID, uid, Role.Owner))) {
+        throw new Error('You do not have permission to update the role of members in this plan');
+      }
 
+      await this.db.firestore.runTransaction(async (transaction) => {
         const planDocRef = this.planRef.doc(planID).ref;
         const planDocSnapshot = await transaction.get(planDocRef);
         if (!planDocSnapshot.exists) {
@@ -170,10 +195,43 @@ export class PlanService {
 
   async getUserPlans(uid: string): Promise<string[]> {
     try {
-      const querySnapshot = await this.planRef.ref.where('members', 'array-contains', uid).get();
-      return querySnapshot.docs.map(doc => doc.id);
+      const ownerQuerySnapshot = await this.planRef.ref
+        .where('members', 'array-contains', { uid: uid, role: Role.Owner })
+        .get();
+
+      const coOwnerQuerySnapshot = await this.planRef.ref
+        .where('members', 'array-contains', { uid: uid, role: Role.CoOwner })
+        .get();
+
+      const plannerQuerySnapshot = await this.planRef.ref
+        .where('members', 'array-contains', { uid: uid, role: Role.Planner })
+        .get();
+
+      const attendeeQuerySnapshot = await this.planRef.ref
+        .where('members', 'array-contains', { uid: uid, role: Role.Attendee })
+        .get();
+
+      const ownerPlans = ownerQuerySnapshot.docs.map(doc => doc.id);
+      const coOwnerPlans = coOwnerQuerySnapshot.docs.map(doc => doc.id);
+      const plannerPlans = plannerQuerySnapshot.docs.map(doc => doc.id);
+      const attendeePlans = attendeeQuerySnapshot.docs.map(doc => doc.id);
+
+      const userPlans = Array.from(new Set([...ownerPlans, ...coOwnerPlans, ...plannerPlans, ...attendeePlans]));
+
+      return userPlans;
     } catch (error) {
       throw new Error('Failed to get plans for user: ' + error);
+    }
+  }
+
+  async getPlanInvites(uid: string): Promise<string[]> {
+    try {
+      const querySnapshot = await this.planRef.ref
+        .where('members', 'array-contains', { uid: uid, role: Role.Invited })
+        .get();
+      return querySnapshot.docs.map(doc => doc.id);
+    } catch (error) {
+      throw new Error('Failed to get plan invites for user: ' + error);
     }
   }
 
@@ -416,15 +474,16 @@ export enum Role {
   Owner = "owner",
   CoOwner = "coOwner",
   Planner = "planner",
-  Attendee = "attendee"
+  Attendee = "attendee",
+  Invited = "invited"
 }
 
-// Define the precedence of roles
 const rolePrecedence = {
   owner: 1,
   coOwner: 2,
   planner: 3,
-  attendee: 4
+  attendee: 4,
+  invited: 5
 };
 
 export interface UserLocation {
@@ -434,8 +493,14 @@ export interface UserLocation {
 }
 
 export interface Location {
-  fsqID: FieldValue | string;
+  id: FieldValue | string;
   name: FieldValue | string;
   lng: FieldValue | number;
   lat: FieldValue | number;
+  type: FieldValue | LocationType;
+}
+
+export enum LocationType {
+  Foursquare = 'foursquare',
+  Custom = 'custom'
 }
