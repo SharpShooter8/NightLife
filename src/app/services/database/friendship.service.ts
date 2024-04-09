@@ -13,14 +13,17 @@ export class FriendshipService {
     this.friendRef = this.db.collection<FriendData>('Friendships');
   }
 
-  async createFriendship(user1: string, user2: string): Promise<void> {
+  async createFriendship(senderUID: string, recieverUID: string): Promise<void> {
     try {
+      if(senderUID === recieverUID){
+        throw new Error('Cannot create friendship between 2 of the same uid');
+      }
       const friendshipQuery = await this.friendRef.ref
-        .where('user1', 'in', [user1, user2])
+        .where('user1', 'in', [senderUID, recieverUID])
         .get();
 
       const friendshipQuery2 = await this.friendRef.ref
-        .where('user2', 'in', [user1, user2])
+        .where('user2', 'in', [senderUID, recieverUID])
         .get();
 
       if (!friendshipQuery.empty && !friendshipQuery2.empty) {
@@ -28,8 +31,8 @@ export class FriendshipService {
       }
 
       const friendshipData: FriendData = {
-        user1,
-        user2,
+        user1: senderUID,
+        user2: recieverUID,
         status: FriendRequestStatus.Pending
       };
 

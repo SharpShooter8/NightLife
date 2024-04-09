@@ -63,10 +63,10 @@ export class UserService {
     }
   }
 
-  async doesUserDocExist(uid: string): Promise<boolean> {
+  async doesUserExist(uid: string): Promise<boolean> {
     try {
-      const snapshot = await this.userRef.doc(uid).ref.get();
-      return snapshot.exists;
+      const userDoc = await this.userRef.doc(uid).ref.get();
+      return userDoc.exists;
     } catch (error) {
       throw new Error("Problem in doesUserDocExist: " + error);
     }
