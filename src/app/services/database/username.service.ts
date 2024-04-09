@@ -64,9 +64,14 @@ export class UsernameService {
     }
   }
 
-  async getUID(username: string): Promise<string | FieldValue | undefined> {
+  async getUID(username: string): Promise<string> {
     try {
-      return (await this.usernameRef.doc(username).ref.get()).data()?.uid;
+      const usernameDocRef = this.usernameRef.doc(username).ref;
+      const usernameDocSnapshot = await usernameDocRef.get();
+      if (!usernameDocSnapshot.exists) {
+        throw new Error('Username does not exist');
+      }
+      return usernameDocSnapshot.data()?.uid as string;
     } catch (error) {
       throw new Error('Failed to get UID from username: ' + error);
     }
@@ -80,8 +85,29 @@ export class UsernameService {
       throw new Error('Failed to get username from UID: ' + error);
     }
   }
+
+  async updateMissingUsernameData(username: string): Promise<void>{
+    try {
+      const usernameDocRef = this.usernameRef.doc(username).ref;
+      const usernameDocSnapshot = await usernameDocRef.get();
+      if (!usernameDocSnapshot.exists) {
+        throw new Error(`Username document with UID ${username} does not exist`);
+      }
+
+      const usernameData = usernameDocSnapshot.data() as UsernameData;
+      const updatedUsernameData: UsernameData = { ...defaultUsernameData, ...usernameData };
+
+      await this.usernameRef.doc(username).set(updatedUsernameData);
+    } catch (error) {
+      throw new Error("Failed to validate username data: " + error);
+    }
+  }
 }
 
 export interface UsernameData {
   uid: FieldValue | string;
+}
+
+const defaultUsernameData: UsernameData = {
+  uid: "default uid"
 }

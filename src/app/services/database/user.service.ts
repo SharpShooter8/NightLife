@@ -15,14 +15,18 @@ export class UserService {
 
   async createUser(uid: string, username: string): Promise<void> {
     try {
-      const userDoc = await this.userRef.doc(uid).ref.get();
-      if (userDoc.exists) {
+      const userDocRef = this.userRef.doc(uid).ref;
+      const userDocSnapshot = await userDocRef.get();
+      if (userDocSnapshot.exists) {
         throw new Error('User with the provided UID already exists');
       }
 
       const userData: UserData = {
         username,
-        settings: { accountPrivate: true, locationAllowed: true },
+        settings: {
+          accountPrivate: true,
+          locationAllowed: true
+        },
       }
 
       await this.userRef.doc(uid).set(userData);
@@ -47,8 +51,13 @@ export class UserService {
 
   async getUserData(uid: string): Promise<UserData | null> {
     try {
-      const userDoc = await this.userRef.doc(uid).ref.get();
-      return userDoc.data() || null;
+      const userDocRef = this.userRef.doc(uid).ref;
+      const userDocSnapshot = await userDocRef.get();
+      if (!userDocSnapshot.exists) {
+        throw new Error(`User document with UID ${uid} does not exist`);
+      }
+
+      return userDocSnapshot.data() || null;
     } catch (error) {
       throw new Error("Failed to get user data: " + error);
     }
@@ -56,7 +65,8 @@ export class UserService {
 
   async getUidGivenUsername(username: string): Promise<string | undefined> {
     try {
-      const querySnapshot = await this.userRef.ref.where('username', '==', username).get();
+      const queryRef = this.userRef.ref;
+      const querySnapshot = await queryRef.where('username', '==', username).get();
       return querySnapshot.docs[0]?.id;
     } catch (error) {
       throw new Error("Problem in getUidGivenUsername: " + error);
@@ -65,10 +75,42 @@ export class UserService {
 
   async doesUserExist(uid: string): Promise<boolean> {
     try {
-      const userDoc = await this.userRef.doc(uid).ref.get();
-      return userDoc.exists;
+      const userDocRef = this.userRef.doc(uid).ref;
+      const userDocSnapshot = await userDocRef.get();
+      return userDocSnapshot.exists;
     } catch (error) {
       throw new Error("Problem in doesUserDocExist: " + error);
+    }
+  }
+
+  async updateSettings(uid: string, newSettingsData: Partial<Settings>): Promise<void> {
+    try {
+      const userDocRef = this.userRef.doc(uid).ref;
+      const userDocSnapshot = await userDocRef.get();
+      if (!userDocSnapshot.exists) {
+        throw new Error(`User document with UID ${uid} does not exist`);
+      }
+      const currentSettings = userDocSnapshot.data()?.settings;
+      const updatedSettings: Settings = { ...currentSettings, ...newSettingsData } as Settings;
+      await this.userRef.doc(uid).update({ settings: updatedSettings });
+    } catch (error) {
+      throw new Error('Failed to update settings: ' + error);
+    }
+  }
+
+  async updateMissingUserData(uid: string): Promise<void> {
+    try {
+      const userDocRef = this.userRef.doc(uid).ref;
+      const userDocSnapshot = await userDocRef.get();
+      if (!userDocSnapshot.exists) {
+        throw new Error(`User document with UID ${uid} does not exist`);
+      }
+
+      const userData = userDocSnapshot.data() as UserData;
+      const updatedUserData: UserData = { ...defaultUserValues, ...userData };
+      await this.userRef.doc(uid).set(updatedUserData);
+    } catch (error) {
+      throw new Error("Failed to validate user data: " + error);
     }
   }
 }
@@ -81,4 +123,12 @@ export interface UserData {
 export interface Settings {
   accountPrivate: FieldValue | boolean;
   locationAllowed: FieldValue | boolean;
+}
+
+const defaultUserValues: UserData = {
+  username: "defaultUsername",
+  settings: {
+    accountPrivate: true,
+    locationAllowed: true,
+  }
 }

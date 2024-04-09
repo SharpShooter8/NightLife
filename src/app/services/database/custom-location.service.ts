@@ -39,11 +39,11 @@ export class CustomLocationService {
     }
   }
 
-  async updateLocation(uid: string, locationID: string, data: Partial<Location>): Promise<void> {
+  async updateLocation(uid: string, locationID: string, updatedLocationData: Partial<Location>): Promise<void> {
     try {
       await this.checkAccess(uid, locationID);
       const existingLocation = await this.getLocationData(locationID);
-      const updatedLocation: Location = { ...existingLocation, ...data } as Location;
+      const updatedLocation: Location = { ...existingLocation, ...updatedLocationData } as Location;
       await this.customLocationRef.doc(locationID).update({ location: updatedLocation });
     } catch (error) {
       throw new Error('Failed to update location: ' + error);
@@ -148,6 +148,23 @@ export class CustomLocationService {
     }
   }
 
+  async updateMissingLocationData(locationID: string): Promise<void> {
+    try {
+      const locationDocRef = this.customLocationRef.doc(locationID).ref;
+      const locationDocSnapshot = await locationDocRef.get();
+      if (!locationDocSnapshot.exists) {
+        throw new Error(`Custom location document with ID ${locationID} does not exist`);
+      }
+
+      const locationData = locationDocSnapshot.data() as CustomLocationData;
+      const updatedlocationData: CustomLocationData = { ...defaultCustomLocationData, ...locationData };
+
+      await this.customLocationRef.doc(locationID).set(updatedlocationData);
+    } catch (error) {
+      throw new Error("Failed to validate custom location data: " + error);
+    }
+  }
+
   private calculateDistance(lng1: number, lat1: number, lng2: number, lat2: number): number {
     const r = 6371; // km
     const p = Math.PI / 180;
@@ -207,4 +224,20 @@ export enum Price {
   Pricey = 'pricey',
   Expensive = 'expensive'
 }
+
+const defaultCustomLocationData: CustomLocationData = {
+  owner: "default owner",
+  location: {
+    name: "default name",
+    createdBy: "default creator",
+    description: "default description",
+    lng: 0,
+    lat: 0,
+    pictures: [],
+    hours: "default hours",
+    price: "default price",
+    formattedAddress: "default address"
+  },
+  comments: []
+};
 

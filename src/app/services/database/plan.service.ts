@@ -410,6 +410,23 @@ export class PlanService {
     }
   }
 
+  async updateMissingPlanData(planID: string): Promise<void> {
+    try {
+      const planDocRef = this.planRef.doc(planID).ref;
+      const planDocSnapshot = await planDocRef.get();
+      if (!planDocSnapshot.exists) {
+        throw new Error(`Plan document with ID ${planID} does not exist`);
+      }
+
+      const planData = planDocSnapshot.data() as PlanData;
+      const updatedPlanData: PlanData = { ...defaultPlanData, ...planData };
+
+      await this.planRef.doc(planID).set(updatedPlanData);
+    } catch (error) {
+      throw new Error("Failed to validate plan data: " + error);
+    }
+  }
+
   private async getRole(uid: string, planID: string): Promise<Role> {
     try {
       const planDocSnapshot = await this.planRef.doc(planID).ref.get();
@@ -504,3 +521,13 @@ export enum LocationType {
   Foursquare = 'foursquare',
   Custom = 'custom'
 }
+
+const defaultPlanData: PlanData = {
+  name: "default name",
+  created: "default created date",
+  startDate: "default start date",
+  endDate: "default end date",
+  members: [],
+  userLocations: [],
+  placeLocations: []
+};

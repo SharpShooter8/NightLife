@@ -7,36 +7,34 @@ import { FieldValue } from '@angular/fire/firestore';
 })
 export class FriendshipService {
 
-  private friendRef: AngularFirestoreCollection<FriendData>;
+  private friendshipRef: AngularFirestoreCollection<FriendshipData>;
 
   constructor(private db: AngularFirestore) {
-    this.friendRef = this.db.collection<FriendData>('Friendships');
+    this.friendshipRef = this.db.collection<FriendshipData>('Friendships');
   }
 
   async createFriendship(senderUID: string, recieverUID: string): Promise<void> {
     try {
-      if(senderUID === recieverUID){
+      if (senderUID === recieverUID) {
         throw new Error('Cannot create friendship between 2 of the same uid');
       }
-      const friendshipQuery = await this.friendRef.ref
-        .where('user1', 'in', [senderUID, recieverUID])
-        .get();
 
-      const friendshipQuery2 = await this.friendRef.ref
+      const friendshipQuery = await this.friendshipRef.ref
+        .where('user1', 'in', [senderUID, recieverUID])
         .where('user2', 'in', [senderUID, recieverUID])
         .get();
 
-      if (!friendshipQuery.empty && !friendshipQuery2.empty) {
+      if (!friendshipQuery.empty) {
         throw new Error('Friendship already exists');
       }
 
-      const friendshipData: FriendData = {
+      const friendshipData: FriendshipData = {
         user1: senderUID,
         user2: recieverUID,
         status: FriendRequestStatus.Pending
       };
 
-      await this.friendRef.add(friendshipData);
+      await this.friendshipRef.add(friendshipData);
     } catch (error) {
       throw new Error('Failed to create friendship: ' + error);
     }
@@ -44,15 +42,12 @@ export class FriendshipService {
 
   async removeFriendship(user1: string, user2: string): Promise<void> {
     try {
-      const friendshipQuery = await this.friendRef.ref
+      const friendshipQuery = await this.friendshipRef.ref
         .where('user1', 'in', [user1, user2])
-        .get();
-
-      const friendshipQuery2 = await this.friendRef.ref
         .where('user2', 'in', [user1, user2])
         .get();
 
-      if (friendshipQuery.empty && friendshipQuery2.empty) {
+      if (friendshipQuery.empty) {
         throw new Error('Friendship does not exists');
       }
 
@@ -66,7 +61,7 @@ export class FriendshipService {
 
   async acceptFriendRequest(senderUID: string, recieverUID: string): Promise<void> {
     try {
-      const friendshipQuery = await this.friendRef.ref
+      const friendshipQuery = await this.friendshipRef.ref
         .where('user1', '==', senderUID)
         .where('user2', '==', recieverUID)
         .where('status', '==', FriendRequestStatus.Pending)
@@ -87,7 +82,7 @@ export class FriendshipService {
     try {
       const friends: string[] = [];
 
-      const friendQuery1 = await this.friendRef.ref
+      const friendQuery1 = await this.friendshipRef.ref
         .where('user1', '==', userID)
         .where('status', '==', FriendRequestStatus.Accepted)
         .get();
@@ -96,7 +91,7 @@ export class FriendshipService {
         friends.push(doc.data().user2 as string);
       });
 
-      const friendQuery2 = await this.friendRef.ref
+      const friendQuery2 = await this.friendshipRef.ref
         .where('user2', '==', userID)
         .where('status', '==', FriendRequestStatus.Accepted)
         .get();
@@ -114,7 +109,7 @@ export class FriendshipService {
   async getPendingFriends(userID: string): Promise<string[]> {
     try {
       const pendingUIDs: string[] = [];
-      const friendQuery = await this.friendRef.ref
+      const friendQuery = await this.friendshipRef.ref
         .where('user1', '==', userID)
         .where('status', '==', FriendRequestStatus.Pending)
         .get();
@@ -132,7 +127,7 @@ export class FriendshipService {
   async getFriendRequest(userID: string): Promise<string[]> {
     try {
       const requestUIDs: string[] = [];
-      const friendQuery = await this.friendRef.ref
+      const friendQuery = await this.friendshipRef.ref
         .where('user2', '==', userID)
         .where('status', '==', FriendRequestStatus.Pending)
         .get();
@@ -146,9 +141,31 @@ export class FriendshipService {
       throw new Error('Problem getting friend request: ' + error);
     }
   }
+
+  async updateMissingFriendshipData(user1: string, user2: string): Promise<void> {
+    try {
+      const friendshipQuery = await this.friendshipRef.ref
+        .where('user1', 'in', [user1, user2])
+        .where('user2', 'in', [user1, user2])
+        .get();
+
+      if (friendshipQuery.empty) {
+        throw new Error('Friendship document does not exist');
+      }
+
+      const friendshipDoc = friendshipQuery.docs[0];
+      const friendshipData = friendshipDoc.data() as FriendshipData;
+      const updatedFriendshipData: FriendshipData = { ...defaultFriendshipData, ...friendshipData };
+
+      await friendshipDoc.ref.set(updatedFriendshipData);
+    } catch (error) {
+      throw new Error("Failed to validate friendship data: " + error);
+    }
+  }
+
 }
 
-export interface FriendData {
+export interface FriendshipData {
   user1: FieldValue | string;
   user2: FieldValue | string;
   status: FieldValue | FriendRequestStatus;
@@ -157,4 +174,10 @@ export interface FriendData {
 export enum FriendRequestStatus {
   Pending = "pending",
   Accepted = "accepted"
+}
+
+const defaultFriendshipData: FriendshipData = {
+  user1: "default user 1",
+  user2: "default user 2",
+  status: FriendRequestStatus.Pending
 }
