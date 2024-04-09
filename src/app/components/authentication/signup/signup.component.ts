@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { IonButton, IonInput, IonItem } from "@ionic/angular/standalone";
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { UserService } from 'src/app/services/database/user.service';
+import { UsernameService } from 'src/app/services/database/username.service';
 
 @Component({
   selector: 'app-signup',
@@ -17,7 +18,7 @@ export class SignupComponent  implements OnInit {
   email:string = "";
   password:string = "";
 
-  constructor(private userData:UserService, private auth: AuthenticationService) { }
+  constructor(private userData:UserService, private usernameData: UsernameService, private auth: AuthenticationService) { }
 
   ngOnInit() {
     console.log("Sign Up Component Created");
@@ -30,6 +31,7 @@ export class SignupComponent  implements OnInit {
     this.auth.registerUser(this.email, this.password, this.username).then((data)=>{
       if(data){
         this.userData.createUser(data.uid, this.username);
+        this.usernameData.createUsername(this.username, data.uid);
       }
       console.log(data);
     }).catch((e) => {

@@ -1,4 +1,4 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core';
+import { APP_INITIALIZER, enableProdMode, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter } from '@angular/router';
 import { IonicRouteStrategy, provideIonicAngular } from '@ionic/angular/standalone';
@@ -10,8 +10,10 @@ import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
 import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 import { getStorage, provideStorage } from '@angular/fire/storage'
-import {AngularFireModule} from '@angular/fire/compat'
+import { AngularFireModule } from '@angular/fire/compat'
 import { HttpClientModule } from '@angular/common/http';
+import { initialize } from '@ionic/core';
+import { AuthenticationService } from './app/services/authentication/authentication.service';
 
 if (environment.production) {
   enableProdMode();
@@ -28,5 +30,5 @@ bootstrapApplication(AppComponent, {
     importProvidersFrom(provideFirestore(() => getFirestore())),
     importProvidersFrom(provideStorage(() => getStorage())),
     importProvidersFrom(AngularFireModule.initializeApp(environment.firebase)),
-  ],
+  ]
 });

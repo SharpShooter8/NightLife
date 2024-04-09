@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
-import { firstValueFrom } from 'rxjs';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
-import { UserService } from 'src/app/services/database/user.service';
+import { Friend, UserService } from 'src/app/services/database/user.service';
+import { UsernameService } from 'src/app/services/database/username.service';
 
 @Component({
   selector: 'app-friends',
@@ -17,9 +17,9 @@ export class FriendsComponent implements OnInit {
   friendsList: any = [];
   newFriend: string = "";
 
-  constructor(private userData: UserService, private auth: AuthenticationService) {
-    this.auth.loggedIn.subscribe(isLoggedIn => {
-      if (isLoggedIn) {
+  constructor(private usernameData: UsernameService, private userData: UserService, private auth: AuthenticationService) {
+    this.auth.currentUser.subscribe(user => {
+      if (user) {
         this.getFriends();
       }
     })
@@ -29,9 +29,9 @@ export class FriendsComponent implements OnInit {
     console.log("Friends Component Generated");
   }
 
-  async addFriend(){
+  async addFriend() {
     let uid = this.auth.currentUser.getValue()?.uid;
-    let friendUid = await firstValueFrom(this.userData.getUidGivenUsername(this.newFriend));
+    let friendUid = await this.usernameData.getUID(this.newFriend) as string;
     if (uid && friendUid) {
       await this.userData.addFriend(uid, friendUid);
     }
@@ -42,19 +42,17 @@ export class FriendsComponent implements OnInit {
     this.friendsList = [];
     const uid = this.auth.currentUser.getValue()?.uid;
     if (uid) {
-      this.userData.getUserData(uid).subscribe(async data => {
-        const friends = data.data()?.friends;
-        if (friends && Array.isArray(friends)) {
-          for (const friend of friends) {
-            let username = (await firstValueFrom(this.userData.getUserData(friend.uid))).data()?.username;
-            this.friendsList.push({uid: friend.uid, username: username, status: friend.status});
-          }
-        }
-      });
+      const data = await this.userData.getUserData(uid);
+      const friends = data?.friends as Friend[];
+
+      for (const friend of friends) {
+        let username = await this.usernameData.getUsername(friend.uid);
+        this.friendsList.push({ uid: friend.uid, username: username, status: friend.status });
+      }
     }
   }
 
-  async removeFriend(friendUID: string){
+  async removeFriend(friendUID: string) {
     let uid = this.auth.currentUser.getValue()?.uid;
     if (uid) {
       await this.userData.removeFriend(uid, friendUID);
@@ -62,7 +60,7 @@ export class FriendsComponent implements OnInit {
     this.getFriends();
   }
 
-  async acceptFriendRequest(friendUID: string){
+  async acceptFriendRequest(friendUID: string) {
     let uid = this.auth.currentUser.getValue()?.uid;
     if (uid) {
       await this.userData.acceptFriendRequest(uid, friendUID);

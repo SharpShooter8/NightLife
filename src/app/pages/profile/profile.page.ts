@@ -21,6 +21,7 @@ export class ProfilePage implements OnInit {
   lastSignedIn: string | undefined = "NA";
   id: string | null | undefined = "NA";
   userProfileImage: string | null | undefined;
+  userEmailVerified: boolean | undefined;
 
   protected userService = inject(UserService);
   protected userObject!: any;
@@ -33,6 +34,7 @@ export class ProfilePage implements OnInit {
     this.user = this.auth.currentUser.getValue();
     this.userEmail = this.user?.email;
     this.id = this.user?.uid;
+    this.userEmailVerified = this.user?.emailVerified;
     if (this.id != null) {
       this.userProfileImage = await this.image.downloadProfileImage(this.id);
     }
@@ -41,11 +43,6 @@ export class ProfilePage implements OnInit {
     this.lastSignedIn = this.user?.metadata.lastSignInTime;
     console.log("Current User ID: " + this.id);
     console.log("Current User Email: " + this.userEmail)
-    if (this.id) {
-      this.userService.getUserObject(this.id).subscribe(userData => {
-        this.userObject = userData;
-      });
-    }
 
   }
 
@@ -54,7 +51,6 @@ export class ProfilePage implements OnInit {
 
   async signOut() {
     await this.auth.signOut();
-    window.location.reload();
   }
 
   async uploadImage(event: any) {

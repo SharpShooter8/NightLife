@@ -8,71 +8,121 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AuthenticationService {
 
-  readonly loggedIn: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  readonly currentUser: BehaviorSubject<firebase.default.User | null> = new BehaviorSubject<firebase.default.User | null>(null);
+  currentUser: BehaviorSubject<firebase.default.User | null> = new BehaviorSubject<firebase.default.User | null>(null);
 
-  constructor(private ngFireAuth: AngularFireAuth, private router: Router) {
+  constructor(private fireAuth: AngularFireAuth, private router: Router) {
     this.authStatusListener();
   }
 
   authStatusListener() {
-    this.ngFireAuth.onAuthStateChanged((user) => {
+    this.fireAuth.onAuthStateChanged((user) => {
       if (user) {
         this.currentUser.next(user);
-        this.loggedIn.next(true);
         console.log('User is logged in');
       } else {
         this.currentUser.next(null);
-        this.loggedIn.next(false);
         console.log('User is logged out');
+        this.router.navigateByUrl('');
       }
     });
   }
 
+  // Get if the user logged in
+  get isAuthenticated(): boolean {
+    return !!this.currentUser.value;
+  }
+
+  get isVerified(): boolean{
+    return !!this.currentUser.value?.emailVerified;
+  }
+
   async registerUser(email: string, password: string, username: string): Promise<firebase.default.User | null> {
     try {
-      const data = await this.ngFireAuth.createUserWithEmailAndPassword(email, password);
-      const update = await this.updateUserProfile({username: username});
-      return data.user;
+      const { user } = await this.fireAuth.createUserWithEmailAndPassword(email, password);
+      await this.updateUserProfile({ username });
+      await this.sendEmailVerification();
+      return user;
     } catch (error) {
-      console.log(error);
+      console.error('Error registering user:', error);
       return null;
     }
   }
 
   async updateUserProfile(data: Profile): Promise<void> {
-    return (await this.ngFireAuth.currentUser)?.updateProfile(data);
+    try {
+      if (this.currentUser.value != null) {
+        await this.currentUser.value.updateProfile(data);
+      } else {
+        throw new Error('No user is currently logged in to update profile');
+      }
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+    }
   }
 
   async loginUser(email: string, password: string): Promise<boolean> {
     try {
-      await this.ngFireAuth.signInWithEmailAndPassword(email, password);
-      this.router.navigateByUrl('/home/map');
+      await this.fireAuth.signInWithEmailAndPassword(email, password);
+      this.router.navigateByUrl('/home/dashboard');
       return true;
     } catch (error) {
-      console.log(error);
+      console.error('Error logging in:', error);
       return false;
     }
   }
 
   async resetPassword(email: string): Promise<boolean> {
     try {
-      await this.ngFireAuth.sendPasswordResetEmail(email);
+      await this.fireAuth.sendPasswordResetEmail(email);
       return true;
     } catch (error) {
-      console.log(error);
+      console.error('Error resetting password:', error);
       return false;
+    }
+  }
+
+  async sendEmailVerification(): Promise<void> {
+    try {
+      await this.currentUser.value?.sendEmailVerification();
+    } catch (error) {
+      console.error('Error sending email verification:', error);
+    }
+  }
+
+  async updateEmail(newEmail: string): Promise<void> {
+    try {
+      await this.currentUser.value?.updateEmail(newEmail);
+    } catch (error) {
+      console.error('Error updating email:', error);
+    }
+  }
+
+  async updatePassword(newPassword: string): Promise<void> {
+    try {
+      await this.currentUser.value?.updatePassword(newPassword);
+    } catch (error) {
+      console.error('Error updating password:', error);
+    }
+  }
+
+  async sendPasswordResetEmail(): Promise<void> {
+    try {
+      const email = this.currentUser.value?.email;
+      if (email) {
+        await this.fireAuth.sendPasswordResetEmail(email);
+      }
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
     }
   }
 
   async signOut(): Promise<boolean> {
     try {
-      await this.ngFireAuth.signOut();
-      this.router.navigateByUrl('access-portal');
+      await this.fireAuth.signOut();
+      this.router.navigateByUrl('');
       return true;
     } catch (error) {
-      console.log(error);
-      this.router.navigateByUrl('');
+      console.error('Error signing out:', error);
       return false;
     }
   }
