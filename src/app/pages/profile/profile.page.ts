@@ -7,6 +7,8 @@ import { UserService } from 'src/app/services/database/user.service'
 import { ImageService } from 'src/app/services/storage/image.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { environment } from 'src/environments/environment';
+import { ModalController } from '@ionic/angular';
+import { ProfileSettingsPage } from './profile-settings/profile-settings.page';
 
 
 @Component({
@@ -26,6 +28,7 @@ export class ProfilePage implements OnInit {
   id: string | null | undefined = "NA";
   userProfileImage: string | null | undefined;
   userBio: string | null | undefined;
+  defaultImage: string = "../../../assets/Default_pfp.svg.png";
 
   protected userService = inject(UserService);
   protected userObject!: any;
@@ -33,12 +36,13 @@ export class ProfilePage implements OnInit {
   user: firebase.default.User | null = null;
 
   constructor(private auth: AuthenticationService, private image: ImageService, private firestore: 
-    AngularFirestore) { }
+    AngularFirestore, private modalCtrl: ModalController) { }
 
   async ngOnInit() {
     this.user = this.auth.currentUser.getValue();
     this.userEmail = this.user?.email;
     this.id = this.user?.uid;
+
     if (this.id != null) {
       this.userProfileImage = await this.image.downloadProfileImage(this.id);
     }
@@ -48,16 +52,20 @@ export class ProfilePage implements OnInit {
     if (this.id) {
       this.userService.getUserObject(this.id).subscribe(userData => {
         this.userObject = userData;
-        this.userBio = userData.profileBio;
+        this.userBio = userData.profileInfo.bio;
       });
     }
 
-
-
+    if(!this.userProfileImage){
+      this.userProfileImage = this.defaultImage
+    }
   }
 
   async editForm() {
-
+    const modal = await this.modalCtrl.create({
+      component: ProfileSettingsPage
+    });
+    return await modal.present();
   }
 
   async signOut() {
@@ -72,5 +80,4 @@ export class ProfilePage implements OnInit {
 
     }
   }
-
 }
