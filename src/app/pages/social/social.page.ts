@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { FriendsComponent } from 'src/app/components/user/friends/friends.component';
+import { PlansComponent } from 'src/app/components/user/plans/plans.component';
 
 @Component({
   selector: 'app-social',
   templateUrl: './social.page.html',
   styleUrls: ['./social.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FriendsComponent]
+  imports: [IonicModule, CommonModule, FormsModule, FriendsComponent, PlansComponent]
 })
 export class SocialPage implements OnInit {
 

@@ -46,6 +46,7 @@
 
     <input #inputField type="file" hidden (change)="uploadImage($event)">
 
+    <p>Email Verified: {{userEmailVerified}}</p>
 
     <div class="button-container">
       <ion-button (click)="signOut()">Sign Out</ion-button>

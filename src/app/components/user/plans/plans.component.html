@@ -1,0 +1,13 @@
+<ion-button (click)="createPlan()">Create Plan</ion-button>
+
+<ion-list>
+  @for(plan of plans; track plan){
+  <ion-item>
+    <ion-item-group>
+
+    </ion-item-group>
+    <ion-text>{{plan.data.name}}</ion-text>
+    <ion-button (click)="deletePlan(plan.id)">Delete Plan</ion-button>
+  </ion-item>
+  }
+</ion-list>
