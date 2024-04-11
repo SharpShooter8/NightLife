@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
+import { Auth, User, UserInfo, updateProfile } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, concatMap, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,7 @@ export class AuthenticationService {
       return null;
     }
   }
+
 
   async updateUserProfile(data: Profile): Promise<void> {
     try {

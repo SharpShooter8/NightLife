@@ -1,0 +1,35 @@
+
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Form Modal</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="dismissModal()">Close</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content>
+    <form (ngSubmit)="submitForm()" [formGroup]="profileInfo">
+      <!-- Add your form fields here -->
+      <ion-item>
+        <ion-label position="floating">Update Bio</ion-label>
+        <ion-input type="bio" formControlName="bio"></ion-input>
+      </ion-item>
+      <!-- Add your form fields here -->
+      <ion-item>
+        <ion-label position="floating">Update Username</ion-label>
+        <ion-input type="bio" formControlName="username"></ion-input>
+      </ion-item>
+      <!-- Add more form fields as needed -->
+      <ion-item>
+        <ion-label>Turn on Location</ion-label>
+        <ion-toggle [(ngModel)]="allowLocation" formControlName="allowLocationPermission" (ionChange)="allowLocationChange()"></ion-toggle>
+      </ion-item>
+      <ion-item>
+        <ion-label>Private Account</ion-label>
+        <ion-toggle [(ngModel)]="isAccountPrivate" formControlName="accountPrivate" (ionChange)="makeAccountPrivate()"></ion-toggle>
+      </ion-item>
+      <ion-button expand="block" type="submit">Submit</ion-button>
+    </form>
+
+  </ion-content>

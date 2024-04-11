@@ -1,24 +1,56 @@
 <ion-content [fullscreen]="true">
   <div class="main">
+    <div class="profile-container">
+      <div class="profile-pic-container">
+        <div class="pic-edit-container">
+          <div class="pic-container">
+            <img class="profile-pic" [src]="userProfileImage ?? defaultImage">
+          </div>
 
-    <h1>User Profile</h1>
+          <div class="edit-pic-container">
+            <ion-button class="edit-pic-button" (click)="inputField.click()">
+              <ion-icon class="edit-icon" name="pencil-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+        <div class="profile-stats-container">
+          <div class="follower-container"> 
+            <p>4,124</p>
+            <p>Followers:</p>
+          </div>
+          <div class="clubs-container"> 
+            <p>3</p>
+            <p>Clubs:</p>
+          </div>
+          <div class="misc-container">
+            <p>75</p>
+            <p>Misc:</p>
+          </div>
+        </div>
 
-    <input #inputField type="file" (change)="uploadImage($event)" />
+      </div>
 
-    <div class="profile-pic-container">
-      <img class="profile-pic" [src]= "userProfileImage ?? '../../../assets/Default_pfp.svg.png'">
+      <div class="profile-info-container">
+        <div class="username-container">
+          <p class="username">{{this.userObject?.username}}</p>
+        </div>
+        <div class="profile-sub-info-container">
+          <p class="email">{{ userEmail }}</p>
+          <p>{{userBio ?? 'Add info'}} </p>
+          <div class="socials-container">
+            <p class="socials-header">Socials: </p>
+          </div> 
+        </div>
+      </div>
     </div>
 
-    <h2>Username: {{this.userObject?.username}}</h2>
-    <p>Email: {{ userEmail }}</p>
-    <p>ID: {{ id }}</p>
-    <p>Creation Date: {{ creationDate }}</p>
-    <p>Last Signed In Date: {{ lastSignedIn }}</p>
+    <input #inputField type="file" hidden (change)="uploadImage($event)">
+
     <p>Email Verified: {{userEmailVerified}}</p>
 
     <div class="button-container">
       <ion-button (click)="signOut()">Sign Out</ion-button>
-      <ion-button (click)="test()"> Testing</ion-button>
+      <ion-button (click)="editForm()"> Edit Profile</ion-button>
     </div>
   </div>
 </ion-content>
