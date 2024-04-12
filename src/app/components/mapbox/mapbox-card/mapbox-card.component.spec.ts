@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { IonicModule } from '@ionic/angular';
 
-import { MapboxResultModalComponent } from './mapbox-result-modal.component';
+import { MapboxCardComponent } from './mapbox-card.component';
 
-describe('MapboxResultModalComponent', () => {
-  let component: MapboxResultModalComponent;
-  let fixture: ComponentFixture<MapboxResultModalComponent>;
+describe('MapboxCardComponent', () => {
+  let component: MapboxCardComponent;
+  let fixture: ComponentFixture<MapboxCardComponent>;
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ MapboxResultModalComponent ],
+      declarations: [ MapboxCardComponent ],
       imports: [IonicModule.forRoot()]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(MapboxResultModalComponent);
+    fixture = TestBed.createComponent(MapboxCardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   }));

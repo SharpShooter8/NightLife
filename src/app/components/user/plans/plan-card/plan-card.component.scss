@@ -1,0 +1,48 @@
+#card-container {
+  height: 40vh;
+  display: flex;
+  flex-direction: column;
+  margin: 10vw;
+  background-color: #262437;
+  border-radius: 20px;
+}
+
+#card-header-item{
+  --ion-item-background: transparent;
+}
+
+#card-header-title-label{
+  font-size: 2.5em;
+}
+
+#card-content {
+  overflow-y: scroll;
+  margin-bottom: 3vh;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+#card-content::-webkit-scrollbar {
+  display: none;
+}
+#card-content-result-list {
+  background-color: transparent;
+}
+
+.place-result-item {
+  --ion-item-background: #EF8354;
+  border-radius: 15px;
+  margin-bottom: 2vh;
+}
+
+.place-name-label,
+.place-role-label,
+.place-date-label {
+  color: white;
+}
+
+// #262437 Space Cadet
+// #BC80D4 Lavender (floral)
+// #06D6A0 Emerald
+// #EF8354 Coral
+// #0F7173 Caribbean Current

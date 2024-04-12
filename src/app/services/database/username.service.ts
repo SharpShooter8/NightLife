@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { FieldValue } from '@angular/fire/firestore';
+import { Observable, catchError, defer, from, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,94 +14,133 @@ export class UsernameService {
     this.usernameRef = this.db.collection<UsernameData>('Usernames');
   }
 
-  async createUsername(uid: string, username: string): Promise<void> {
-    try {
-      const usernameExists = await this.usernameExists(username);
-      if (usernameExists) {
-        throw new Error('Username already exists');
-      }
-      await this.usernameRef.doc(username).set({ uid });
-    } catch (error) {
-      throw new Error('Failed to create username: ' + error);
-    }
+  createUsername(uid: string, username: string): Observable<void> {
+    return defer(() => {
+      return this.usernameRef.doc(username).get().pipe(
+        switchMap(snapshot => {
+          if (snapshot.exists) {
+            throw new Error(`Username ${username} already exists`);
+          }
+          return from(snapshot.ref.set({ uid }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to create username: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async removeUsername(username: string): Promise<void> {
-    try {
-      const exists = await this.usernameExists(username);
-      if (!exists) {
-        throw new Error('Username does not exist');
-      }
-      await this.usernameRef.doc(username).delete();
-    } catch (error) {
-      throw new Error('Failed to remove username: ' + error);
-    }
+  removeUsername(username: string): Observable<void> {
+    return defer(() => {
+      return this.usernameRef.doc(username).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`Username ${username} does not exists`);
+          }
+          return from(snapshot.ref.delete());
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to remove username: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async updateUsername(username: string, newUsername: string): Promise<void> {
-    try {
-      await this.db.firestore.runTransaction(async (transaction) => {
-        const usernameDocRef = this.usernameRef.doc(username).ref;
-        const usernameDocSnapshot = await transaction.get(usernameDocRef);
-        if (!usernameDocSnapshot.exists) {
-          throw new Error('Username not found');
-        }
-
-        const uid = usernameDocSnapshot.data()?.uid;
-
-        transaction.delete(usernameDocRef);
-        transaction.set(this.usernameRef.doc(newUsername).ref, { uid });
-      });
-    } catch (error) {
-      throw new Error('Failed to update username: ' + error);
-    }
+  updateUsername(username: string, newUsername: string): Observable<void> {
+    return defer(() => {
+      return this.usernameRef.doc(username).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`Username ${username} does not exists`);
+          }
+          const uid = snapshot.data()?.uid as string;
+          return from(this.db.firestore.runTransaction(async (transaction) => {
+            transaction.delete(snapshot.ref);
+            transaction.set(this.usernameRef.doc(newUsername).ref, { uid });
+          }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update username: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async usernameExists(username: string): Promise<boolean> {
-    try {
-      return (await this.usernameRef.doc(username).ref.get()).exists;
-    } catch (error) {
-      throw new Error('Failed to check username existence: ' + error);
-    }
+  usernameExists(username: string): Observable<boolean> {
+    return defer(() => {
+      return this.usernameRef.doc(username).get().pipe(
+        switchMap(snapshot => {
+          return of(snapshot.exists);
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to check username existence: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async getUID(username: string): Promise<string> {
-    try {
-      const usernameDocRef = this.usernameRef.doc(username).ref;
-      const usernameDocSnapshot = await usernameDocRef.get();
-      if (!usernameDocSnapshot.exists) {
-        throw new Error('Username does not exist');
-      }
-      return usernameDocSnapshot.data()?.uid as string;
-    } catch (error) {
-      throw new Error('Failed to get UID from username: ' + error);
-    }
+  getUID(username: string): Observable<string> {
+    return defer(() => {
+      return this.usernameRef.doc(username).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`Username ${username} does not exists`);
+          }
+          return of(snapshot.data()?.uid as string);
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get UID given username: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async getUsername(uid: string): Promise<string | null> {
-    try {
-      const usernameQuery = await this.usernameRef.ref.where('uid', '==', uid).limit(1).get();
-      return usernameQuery.docs[0]?.id || null;
-    } catch (error) {
-      throw new Error('Failed to get username from UID: ' + error);
-    }
+  getUsername(uid: string): Observable<string> {
+    return defer(() => {
+      return from(this.usernameRef.ref.where('uid', '==', uid).limit(1).get()).pipe(
+        switchMap(snapshot => {
+          if (snapshot.empty) {
+            throw new Error(`Username associated with uid ${uid} does not exist`);
+          }
+          return of(snapshot.docs[0].id);
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get username from UID: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async updateMissingUsernameData(username: string): Promise<void>{
-    try {
-      const usernameDocRef = this.usernameRef.doc(username).ref;
-      const usernameDocSnapshot = await usernameDocRef.get();
-      if (!usernameDocSnapshot.exists) {
-        throw new Error(`Username document with UID ${username} does not exist`);
-      }
-
-      const usernameData = usernameDocSnapshot.data() as UsernameData;
-      const updatedUsernameData: UsernameData = { ...defaultUsernameData, ...usernameData };
-
-      await this.usernameRef.doc(username).set(updatedUsernameData);
-    } catch (error) {
-      throw new Error("Failed to validate username data: " + error);
-    }
+  updateMissingUsernameData(username: string): Observable<void> {
+    return defer(() => {
+      return this.usernameRef.doc(username).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`Username document with UID ${username} does not exist`);
+          }
+          const usernameData = snapshot.data() as UsernameData;
+          const updatedUsernameData: UsernameData = { ...defaultUsernameData, ...usernameData };
+          return from(snapshot.ref.set(updatedUsernameData));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update missing username data: ' + error
+          });
+        })
+      );
+    });
   }
 }
 
@@ -109,5 +149,5 @@ export interface UsernameData {
 }
 
 const defaultUsernameData: UsernameData = {
-  uid: "default uid"
+  uid: 'default uid'
 }

@@ -15,6 +15,7 @@ export class DashboardPage implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    let test = 0;
   }
 
 }

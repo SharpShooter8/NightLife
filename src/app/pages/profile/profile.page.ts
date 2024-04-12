@@ -36,7 +36,11 @@ export class ProfilePage implements OnInit {
     this.id = this.user?.uid;
     this.userEmailVerified = this.user?.emailVerified;
     if (this.id != null) {
-      this.userProfileImage = await this.image.downloadProfileImage(this.id);
+      this.image.downloadProfileImage(this.id).subscribe(
+        (image) => {
+          this.userProfileImage = image;
+        }
+      );
     }
     console.log(this.user?.photoURL);
     this.creationDate = this.user?.metadata.creationTime;
@@ -50,13 +54,13 @@ export class ProfilePage implements OnInit {
   }
 
   async signOut() {
-    await this.auth.signOut();
+    this.auth.signOut().subscribe();
   }
 
   async uploadImage(event: any) {
     if (this.user?.uid) {
-      this.image.uploadProfileImage(event.target.files[0], this.user?.uid);
-      this.auth.updateUserProfile({ photoURL: 'images/profile/' + this.user.uid });
+      this.image.uploadProfileImage(event.target.files[0], this.user?.uid).subscribe();
+      this.auth.updateUserProfile({ photoURL: 'images/profile/' + this.user.uid }).subscribe();
     }
   }
 

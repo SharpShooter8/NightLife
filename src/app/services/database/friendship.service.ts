@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { FieldValue } from '@angular/fire/firestore';
+import { Observable, catchError, defer, forkJoin, from, map, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,154 +14,184 @@ export class FriendshipService {
     this.friendshipRef = this.db.collection<FriendshipData>('Friendships');
   }
 
-  async createFriendship(senderUID: string, recieverUID: string): Promise<void> {
-    try {
+  createFriendship(senderUID: string, recieverUID: string): Observable<void> {
+    return defer(() => {
       if (senderUID === recieverUID) {
         throw new Error('Cannot create friendship between 2 of the same uid');
       }
-
-      const friendshipQuery = await this.friendshipRef.ref
+      return from(this.friendshipRef.ref
         .where('user1', 'in', [senderUID, recieverUID])
         .where('user2', 'in', [senderUID, recieverUID])
-        .get();
+        .get()).pipe(
+          switchMap(snapshot => {
+            if (!snapshot.empty) {
+              throw new Error('Friendship already exists');
+            }
 
-      if (!friendshipQuery.empty) {
-        throw new Error('Friendship already exists');
-      }
-
-      const friendshipData: FriendshipData = {
-        user1: senderUID,
-        user2: recieverUID,
-        status: FriendRequestStatus.Pending
-      };
-
-      await this.friendshipRef.add(friendshipData);
-    } catch (error) {
-      throw new Error('Failed to create friendship: ' + error);
-    }
+            const friendshipData: FriendshipData = {
+              user1: senderUID,
+              user2: recieverUID,
+              status: FriendRequestStatus.Pending
+            };
+            return from(this.friendshipRef.add(friendshipData)).pipe(map(() => { }));
+          }),
+          catchError(error => {
+            return throwError(() => {
+              'Failed to create friendship: ' + error
+            });
+          })
+        );
+    });
   }
 
-  async removeFriendship(user1: string, user2: string): Promise<void> {
-    try {
-      const friendshipQuery = await this.friendshipRef.ref
+  removeFriendship(user1: string, user2: string): Observable<void> {
+    return defer(() => {
+      if (user1 === user2) {
+        throw new Error('Cannot remove friendship between 2 of the same uid');
+      }
+      return from(this.friendshipRef.ref
         .where('user1', 'in', [user1, user2])
         .where('user2', 'in', [user1, user2])
-        .get();
+        .get()).pipe(
+          switchMap(snapshot => {
+            if (snapshot.empty) {
+              throw new Error('Friendship does not exists');
+            }
 
-      if (friendshipQuery.empty) {
-        throw new Error('Friendship does not exists');
-      }
-
-      const batch = this.db.firestore.batch();
-      friendshipQuery.forEach(doc => batch.delete(doc.ref));
-      await batch.commit();
-    } catch (error) {
-      throw new Error('Failed to remove friend: ' + error);
-    }
+            const batch = this.db.firestore.batch();
+            snapshot.docs.forEach(doc => batch.delete(doc.ref));
+            return from(batch.commit());
+          }),
+          catchError(error => {
+            return throwError(() => {
+              'Failed to remove friend: ' + error
+            });
+          })
+        );
+    });
   }
 
-  async acceptFriendRequest(senderUID: string, recieverUID: string): Promise<void> {
-    try {
-      const friendshipQuery = await this.friendshipRef.ref
+
+  acceptFriendRequest(senderUID: string, recieverUID: string): Observable<void> {
+    return defer(() => {
+      if (senderUID === recieverUID) {
+        throw new Error('Cannot accept friendship between 2 of the same uid');
+      }
+      return from(this.friendshipRef.ref
         .where('user1', '==', senderUID)
         .where('user2', '==', recieverUID)
         .where('status', '==', FriendRequestStatus.Pending)
-        .get();
-
-      if (friendshipQuery.empty) {
-        throw new Error('Friend request not found');
-      }
-
-      const friendshipDoc = friendshipQuery.docs[0];
-      await friendshipDoc.ref.update({ status: FriendRequestStatus.Accepted });
-    } catch (error) {
-      throw new Error('Failed to accept friend request: ' + error);
-    }
+        .limit(1)
+        .get()).pipe(
+          switchMap(snapshot => {
+            if (snapshot.empty) {
+              throw new Error('Friend request does not exists');
+            }
+            const friendshipDoc = snapshot.docs[0];
+            return from(friendshipDoc.ref.update({ status: FriendRequestStatus.Accepted }));
+          }),
+          catchError(error => {
+            return throwError(() => {
+              'Failed to accept friend request: ' + error
+            });
+          })
+        );
+    });
   }
 
-  async getFriends(userID: string): Promise<string[]> {
-    try {
-      const friends: string[] = [];
-
-      const friendQuery1 = await this.friendshipRef.ref
+  getFriends(userID: string): Observable<string[]> {
+    return defer(() => {
+      const friendsquery1 = this.friendshipRef.ref
         .where('user1', '==', userID)
-        .where('status', '==', FriendRequestStatus.Accepted)
-        .get();
-
-      friendQuery1.forEach(doc => {
-        friends.push(doc.data().user2 as string);
-      });
-
-      const friendQuery2 = await this.friendshipRef.ref
+        .where('status', '==', FriendRequestStatus.Accepted);
+      const friendsquery2 = this.friendshipRef.ref
         .where('user2', '==', userID)
-        .where('status', '==', FriendRequestStatus.Accepted)
-        .get();
-
-      friendQuery2.forEach(doc => {
-        friends.push(doc.data().user1 as string);
-      });
-
-      return friends;
-    } catch (error) {
-      throw new Error('Problem getting friends: ' + error);
-    }
+        .where('status', '==', FriendRequestStatus.Accepted);
+      return forkJoin([
+        from(friendsquery1.get()).pipe(switchMap(snapshot => of(snapshot.docs))),
+        from(friendsquery2.get()).pipe(switchMap(snapshot => of(snapshot.docs)))
+      ]).pipe(
+        map(([docs1, docs2]) => {
+          const friends1 = docs1.map(doc => doc.data().user2 as string);
+          const friends2 = docs2.map(doc => doc.data().user1 as string);
+          return [...friends1, ...friends2];
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get friends: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async getPendingFriends(userID: string): Promise<string[]> {
-    try {
-      const pendingUIDs: string[] = [];
-      const friendQuery = await this.friendshipRef.ref
+  getPendingFriends(userID: string): Observable<string[]> {
+    return defer(() => {
+      return from(this.friendshipRef.ref
         .where('user1', '==', userID)
         .where('status', '==', FriendRequestStatus.Pending)
-        .get();
-
-      friendQuery.forEach(doc => {
-        pendingUIDs.push(doc.data().user2 as string);
-      });
-
-      return pendingUIDs;
-    } catch (error) {
-      throw new Error('Problem getting pending friends: ' + error);
-    }
+        .get()).pipe(
+          switchMap(snapshot => {
+            const pendingUIDs: string[] = [];
+            snapshot.docs.forEach(doc => {
+              pendingUIDs.push(doc.data().user2 as string);
+            });
+            return of(pendingUIDs);
+          }),
+          catchError(error => {
+            return throwError(() => {
+              'Failed getting pending friends: ' + error
+            });
+          })
+        );
+    });
   }
 
-  async getFriendRequest(userID: string): Promise<string[]> {
-    try {
-      const requestUIDs: string[] = [];
-      const friendQuery = await this.friendshipRef.ref
+  getFriendRequest(userID: string): Observable<string[]> {
+    return defer(() => {
+      return from(this.friendshipRef.ref
         .where('user2', '==', userID)
         .where('status', '==', FriendRequestStatus.Pending)
-        .get();
-
-      friendQuery.forEach(doc => {
-        requestUIDs.push(doc.data().user1 as string);
-      });
-
-      return requestUIDs;
-    } catch (error) {
-      throw new Error('Problem getting friend request: ' + error);
-    }
+        .get()).pipe(
+          switchMap(snapshot => {
+            const requestUIDs: string[] = [];
+            snapshot.docs.forEach(doc => {
+              requestUIDs.push(doc.data().user1 as string);
+            });
+            return of(requestUIDs);
+          }),
+          catchError(error => {
+            return throwError(() => {
+              'Failed getting friend request: ' + error
+            });
+          })
+        );
+    });
   }
 
-  async updateMissingFriendshipData(user1: string, user2: string): Promise<void> {
-    try {
-      const friendshipQuery = await this.friendshipRef.ref
+  updateMissingFriendshipData(user1: string, user2: string): Observable<void> {
+    return defer(() => {
+      return from(this.friendshipRef.ref
         .where('user1', 'in', [user1, user2])
         .where('user2', 'in', [user1, user2])
-        .get();
-
-      if (friendshipQuery.empty) {
-        throw new Error('Friendship document does not exist');
-      }
-
-      const friendshipDoc = friendshipQuery.docs[0];
-      const friendshipData = friendshipDoc.data() as FriendshipData;
-      const updatedFriendshipData: FriendshipData = { ...defaultFriendshipData, ...friendshipData };
-
-      await friendshipDoc.ref.set(updatedFriendshipData);
-    } catch (error) {
-      throw new Error("Failed to validate friendship data: " + error);
-    }
+        .limit(1)
+        .get()).pipe(
+          switchMap(snapshot => {
+            if (snapshot.empty) {
+              throw new Error('Friendship document does not exist');
+            }
+            const friendshipDoc = snapshot.docs[0];
+            const friendshipData = friendshipDoc.data() as FriendshipData;
+            const updatedFriendshipData: FriendshipData = { ...defaultFriendshipData, ...friendshipData };
+            return from(friendshipDoc.ref.set(updatedFriendshipData));
+          }),
+          catchError(error => {
+            return throwError(() => {
+              'Failed updating missing friendship data: ' + error
+            });
+          })
+        );
+    });
   }
 
 }
@@ -172,12 +203,12 @@ export interface FriendshipData {
 }
 
 export enum FriendRequestStatus {
-  Pending = "pending",
-  Accepted = "accepted"
+  Pending = 'pending',
+  Accepted = 'accepted'
 }
 
 const defaultFriendshipData: FriendshipData = {
-  user1: "default user 1",
-  user2: "default user 2",
+  user1: 'default user 1',
+  user2: 'default user 2',
   status: FriendRequestStatus.Pending
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/compat/auth'
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, catchError, concat, defer, forkJoin, from, map, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,99 +32,164 @@ export class AuthenticationService {
     return !!this.currentUser.value;
   }
 
-  get isVerified(): boolean{
+  get isVerified(): boolean {
     return !!this.currentUser.value?.emailVerified;
   }
 
-  async registerUser(email: string, password: string, username: string): Promise<firebase.default.User | null> {
-    try {
-      const { user } = await this.fireAuth.createUserWithEmailAndPassword(email, password);
-      await this.updateUserProfile({ username });
-      await this.sendEmailVerification();
-      return user;
-    } catch (error) {
-      console.error('Error registering user:', error);
-      return null;
-    }
+  registerUser(email: string, password: string, username: string): Observable<firebase.default.User | null> {
+    return defer(() => {
+      return from(this.fireAuth.createUserWithEmailAndPassword(email, password)).pipe(
+        switchMap(data => {
+          return concat([
+            this.updateUserProfile({ username }),
+            this.sendEmailVerification()
+          ]).pipe(
+            switchMap(() => {
+              return of(data.user);
+            })
+          )
+        })
+      )
+    });
   }
 
-  async updateUserProfile(data: Profile): Promise<void> {
-    try {
-      if (this.currentUser.value != null) {
-        await this.currentUser.value.updateProfile(data);
-      } else {
-        throw new Error('No user is currently logged in to update profile');
-      }
-    } catch (error) {
-      console.error('Error updating user profile:', error);
-    }
+  updateUserProfile(data: Profile): Observable<void> {
+    return defer(() => {
+      return this.currentUser.asObservable().pipe(
+        switchMap(user => {
+          if (!user) {
+            throw new Error('Invalid User');
+          }
+          return from(user.updateProfile(data));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update user profile: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async loginUser(email: string, password: string): Promise<boolean> {
-    try {
-      await this.fireAuth.signInWithEmailAndPassword(email, password);
-      this.router.navigateByUrl('/home/dashboard');
-      return true;
-    } catch (error) {
-      console.error('Error logging in:', error);
-      return false;
-    }
+  loginUser(email: string, password: string): Observable<void> {
+    return defer(() => {
+      return from(this.fireAuth.signInWithEmailAndPassword(email, password)).pipe(
+        switchMap(user => {
+          if (!user) {
+            throw new Error('Invalid User');
+          }
+          ;
+          return of(this.router.navigateByUrl('/home/dashboard')).pipe(map(() => { }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to login: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async resetPassword(email: string): Promise<boolean> {
-    try {
-      await this.fireAuth.sendPasswordResetEmail(email);
-      return true;
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      return false;
-    }
+  resetPassword(email: string): Observable<void> {
+    return defer(() => {
+      return from(this.fireAuth.sendPasswordResetEmail(email)).pipe(
+        catchError(error => {
+          return throwError(() => {
+            'Failed to reset password: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async sendEmailVerification(): Promise<void> {
-    try {
-      await this.currentUser.value?.sendEmailVerification();
-    } catch (error) {
-      console.error('Error sending email verification:', error);
-    }
+  sendEmailVerification(): Observable<void> {
+    return defer(() => {
+      return this.currentUser.asObservable().pipe(
+        switchMap(user => {
+          if (!user) {
+            throw new Error('Invalid User');
+          }
+          return from(user.sendEmailVerification());
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to send email verification: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async updateEmail(newEmail: string): Promise<void> {
-    try {
-      await this.currentUser.value?.updateEmail(newEmail);
-    } catch (error) {
-      console.error('Error updating email:', error);
-    }
+  updateEmail(newEmail: string): Observable<void> {
+    return defer(() => {
+      return this.currentUser.asObservable().pipe(
+        switchMap(user => {
+          if (!user) {
+            throw new Error('Invalid User');
+          }
+          return from(user.updateEmail(newEmail));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update user email: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async updatePassword(newPassword: string): Promise<void> {
-    try {
-      await this.currentUser.value?.updatePassword(newPassword);
-    } catch (error) {
-      console.error('Error updating password:', error);
-    }
+  updatePassword(newPassword: string): Observable<void> {
+    return defer(() => {
+      return this.currentUser.asObservable().pipe(
+        switchMap(user => {
+          if (!user) {
+            throw new Error('Invalid User');
+          }
+          return from(user.updatePassword(newPassword));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update user password: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async sendPasswordResetEmail(): Promise<void> {
-    try {
-      const email = this.currentUser.value?.email;
-      if (email) {
-        await this.fireAuth.sendPasswordResetEmail(email);
-      }
-    } catch (error) {
-      console.error('Error sending password reset email:', error);
-    }
+  sendPasswordResetEmail(): Observable<void> {
+    return defer(() => {
+      return this.currentUser.asObservable().pipe(
+        switchMap(user => {
+          if (!user) {
+            throw new Error('Invalid User');
+          }
+          if (!user.email) {
+            throw new Error('User has invalid email');
+          }
+          return from(this.fireAuth.sendPasswordResetEmail(user.email));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to send password reset email: ' + error
+          });
+        })
+      )
+    });
   }
 
-  async signOut(): Promise<boolean> {
-    try {
-      await this.fireAuth.signOut();
-      this.router.navigateByUrl('');
-      return true;
-    } catch (error) {
-      console.error('Error signing out:', error);
-      return false;
-    }
+  signOut(): Observable<void> {
+    return defer(() => {
+      return from(this.fireAuth.signOut()).pipe(
+        switchMap(() => {
+          return of(this.router.navigateByUrl('')).pipe(map(() => { }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to login: ' + error
+          });
+        })
+      )
+    });
   }
 }
 

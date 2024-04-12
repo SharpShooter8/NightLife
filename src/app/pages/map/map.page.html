@@ -1,3 +1,4 @@
-<div id="map-container">
-  <app-mapbox-map (coords)="updateResults($event)" trigger="open-modal"></app-mapbox-map>
-</div>
+<ion-content class="ion-padding">
+  <app-mapbox-map (coords)="updateResults($event)"></app-mapbox-map>
+  <app-mapbox-card></app-mapbox-card>
+</ion-content>

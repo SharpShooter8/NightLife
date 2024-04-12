@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
 import { FieldValue, arrayRemove, arrayUnion } from '@angular/fire/firestore';
+import { Observable, catchError, defer, from, map, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,156 +14,243 @@ export class CustomLocationService {
     this.customLocationRef = this.db.collection<CustomLocationData>('CustomLocations');
   }
 
-  async createLocation(uid: string, location: Location): Promise<string> {
-    try {
+  createLocation(uid: string, location: Location): Observable<void> {
+    return defer(() => {
       const locationData: CustomLocationData = {
         owner: uid,
         location,
         comments: []
       }
-      const ref = await this.customLocationRef.add(locationData);
-      if (!ref?.id) {
-        throw new Error('Failed to create custom location: document reference or ID not found');
-      }
-      return ref.id;
-    } catch (error) {
-      throw new Error('Failed to create location: ' + error);
-    }
+      return from(this.customLocationRef.ref.add(locationData)).pipe(
+        map(() => { }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to create custom location: ' + error
+          });
+        }));
+    });
   }
 
-  async removeLocation(uid: string, locationID: string): Promise<void> {
-    try {
-      await this.checkAccess(uid, locationID);
-      await this.customLocationRef.doc(locationID).delete();
-    } catch (error) {
-      throw new Error('Failed to remove location: ' + error);
-    }
+  removeLocation(uid: string, locationID: string): Observable<void> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          if (snapshot.data()?.owner as string !== uid) {
+            throw new Error(`Cannot remove location UID ${uid} does not own`);
+          }
+          return from(snapshot.ref.delete());
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to remove location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async updateLocation(uid: string, locationID: string, updatedLocationData: Partial<Location>): Promise<void> {
-    try {
-      await this.checkAccess(uid, locationID);
-      const existingLocation = await this.getLocationData(locationID);
-      const updatedLocation: Location = { ...existingLocation, ...updatedLocationData } as Location;
-      await this.customLocationRef.doc(locationID).update({ location: updatedLocation });
-    } catch (error) {
-      throw new Error('Failed to update location: ' + error);
-    }
+  updateLocation(uid: string, locationID: string, updatedLocationData: Partial<Location>): Observable<void> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          if (snapshot.data()?.owner as string !== uid) {
+            throw new Error(`Cannot update location UID ${uid} does not own`);
+          }
+          const existingLocation = snapshot.data()?.location as Location;
+          const updatedLocation: Location = { ...existingLocation, ...updatedLocationData } as Location;
+          return from(snapshot.ref.update({ location: updatedLocation }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to remove location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async addComment(uid: string, locationID: string, content: string): Promise<void> {
-    try {
-      const comment = { id: this.db.createId(), owner: uid, content, dateCreated: "set time" };
-      await this.customLocationRef.doc(locationID).update({ comments: arrayUnion(comment) });
-    } catch (error) {
-      throw new Error('Failed to add comment: ' + error);
-    }
+  addComment(uid: string, locationID: string, content: string): Observable<void> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          const comment = {
+            id: this.db.createId(),
+            owner: uid,
+            content,
+            dateCreated: 'set time'
+          };
+          return from(snapshot.ref.update({ comments: arrayUnion(comment) }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to add comment to custom location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async removeComment(uid: string, locationID: string, commentID: string): Promise<void> {
-    try {
-      await this.checkAccess(uid, locationID);
-      const locationSnapshot = await this.customLocationRef.doc(locationID).ref.get();
-      const locationData = locationSnapshot.data();
-      const comments: Comment[] = locationData?.comments as Comment[] || [];
-      const commentIndex = comments.findIndex(comment => comment.id === commentID);
-      if (commentIndex === -1) {
-        throw new Error('Comment not found');
-      }
-      await this.customLocationRef.doc(locationID).update({ comments: arrayRemove(comments[commentIndex]) });
-    } catch (error) {
-      throw new Error('Failed to remove comment: ' + error);
-    }
+  removeComment(uid: string, locationID: string, commentID: string): Observable<void> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          if (snapshot.data()?.owner as string !== uid) {
+            throw new Error(`Cannot remove comment from locaiton UID ${uid} does not own`);
+          }
+          const comments: Comment[] = snapshot.data()?.comments as Comment[];
+          const commentIndex = comments.findIndex(comment => comment.id === commentID);
+          if (commentIndex === -1) {
+            throw new Error(`Comment not found with ID ${commentID}`);
+          }
+          return from(snapshot.ref.update({ comments: arrayRemove(comments[commentIndex]) }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to remove comment from custom location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async updateComment(uid: string, locationID: string, commentID: string, newContent: string): Promise<void> {
-    try {
-      const locationSnapshot = await this.customLocationRef.doc(locationID).ref.get();
-      const locationData = locationSnapshot.data() as CustomLocationData;
+  updateComment(uid: string, locationID: string, commentID: string, newContent: string): Observable<void> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          const comments: Comment[] = snapshot.data()?.comments as Comment[];
+          const commentIndex = comments.findIndex(comment => comment.id === commentID);
+          if (commentIndex === -1) {
+            throw new Error('Comment not found');
+          }
 
-      const comments: Comment[] = locationData.comments as Comment[];
-      const commentIndex = comments.findIndex(comment => comment.id === commentID);
-      if (commentIndex === -1) {
-        throw new Error('Comment not found');
-      }
+          const comment = comments[commentIndex];
+          if (comment.owner !== uid) {
+            throw new Error('Only the owner of the comment can update it');
+          }
+          const updatedComment = { ...comment, content: newContent };
 
-      const comment = comments[commentIndex];
-      if (comment.owner !== uid) {
-        throw new Error('Only the owner of the comment can update it');
-      }
-      const updatedComment = { ...comment, content: newContent };
-
-      await this.customLocationRef.doc(locationID).update({ comments: arrayRemove(comments[commentIndex]) });
-      await this.customLocationRef.doc(locationID).update({ comments: arrayUnion(updatedComment) });
-    } catch (error) {
-      throw new Error('Failed to update comment: ' + error);
-    }
+          return from(this.db.firestore.runTransaction(async (transaction) => {
+            transaction.update(snapshot.ref, { comments: arrayRemove(comments[commentIndex]) });
+            transaction.update(snapshot.ref, { comments: arrayUnion(updatedComment) });
+          }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update comment from custom location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async getLocationData(locationID: string): Promise<Location> {
-    const locationDoc = await this.customLocationRef.doc(locationID).ref.get();
-    if (!locationDoc.exists) {
-      throw new Error('Location not found');
-    }
-    return locationDoc.data()?.location as Location || {};
+  getLocationData(locationID: string): Observable<Location> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          return of(snapshot.data()?.location as Location);
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get location data from custom location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async getComments(locationID: string): Promise<Comment[]> {
-    try {
-      const locationSnapshot = await this.customLocationRef.doc(locationID).ref.get();
-      const locationData = locationSnapshot.data();
-      if (!locationSnapshot.exists) {
-        throw new Error('Location not found');
-      }
-      const comments: Comment[] = locationData?.comments as Comment[] || [];
-      return comments;
-    } catch (error) {
-      throw new Error('Failed to get comments: ' + error);
-    }
+  getComments(locationID: string): Observable<Comment[]> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          return of(snapshot.data()?.comments as Comment[]);
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get comments from custom location: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async locationsWithinRadius(lng: number, lat: number, radius: number): Promise<Location[]> {
-    try {
-      const locationsSnapshot = await this.customLocationRef.ref.get();
-      const locationsData = locationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data().location as Location }));
+  locationsWithinRadius(lng: number, lat: number, radius: number): Observable<Location[]> {
+    return defer(() => {
+      return this.customLocationRef.get().pipe(
+        switchMap(snapshot => {
+          const locationsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data().location as Location }));
 
-      const locationsWithinRadius = locationsData.filter(locationData => {
-        const { lng: locationLng, lat: locationLat } = locationData as Location;
-        const distance = this.calculateDistance(lng, lat, locationLng as number, locationLat as number);
-        return distance <= radius;
-      });
+          const locationsWithinRadius = locationsData.filter(locationData => {
+            const { lng: locationLng, lat: locationLat } = locationData as Location;
+            const distance = this.calculateDistance(lng, lat, locationLng as number, locationLat as number);
+            return distance <= radius;
+          });
 
-      return locationsWithinRadius.map(locationData => locationData as Location);
-    } catch (error) {
-      throw new Error('Failed to get locations within radius: ' + error);
-    }
+          return of(locationsWithinRadius.map(locationData => locationData as Location));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get locations within radius: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async getUserLocations(uid: string): Promise<string[]> {
-    try {
-      const locationSnapshot = await this.customLocationRef.ref.where('owner', '==', uid).get();
-      const userLocations = locationSnapshot.docs.map(doc => doc.id);
-      return userLocations;
-    } catch (error) {
-      throw new Error('Failed to get user locations: ' + error);
-    }
+  getUserLocations(uid: string): Observable<string[]> {
+    return defer(() => {
+      return from(this.customLocationRef.ref.where('owner', '==', uid).get()).pipe(
+        switchMap(snapshot => {
+          return of(snapshot.docs.map(doc => doc.id));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to get users custom locations: ' + error
+          });
+        })
+      );
+    });
   }
 
-  async updateMissingLocationData(locationID: string): Promise<void> {
-    try {
-      const locationDocRef = this.customLocationRef.doc(locationID).ref;
-      const locationDocSnapshot = await locationDocRef.get();
-      if (!locationDocSnapshot.exists) {
-        throw new Error(`Custom location document with ID ${locationID} does not exist`);
-      }
+  updateMissingLocationData(locationID: string): Observable<void> {
+    return defer(() => {
+      return this.customLocationRef.doc(locationID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error('Location not found');
+          }
+          const locationData = snapshot.data() as CustomLocationData;
+          const updatedlocationData: CustomLocationData = { ...defaultCustomLocationData, ...locationData };
 
-      const locationData = locationDocSnapshot.data() as CustomLocationData;
-      const updatedlocationData: CustomLocationData = { ...defaultCustomLocationData, ...locationData };
-
-      await this.customLocationRef.doc(locationID).set(updatedlocationData);
-    } catch (error) {
-      throw new Error("Failed to validate custom location data: " + error);
-    }
+          return from(snapshot.ref.set(updatedlocationData));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update users custom location data: ' + error
+          });
+        })
+      );
+    });
   }
 
   private calculateDistance(lng1: number, lat1: number, lng2: number, lat2: number): number {
@@ -176,20 +264,6 @@ export class CustomLocationService {
     return 2 * r * Math.asin(Math.sqrt(a)) * 1000; // meters
   }
 
-  private async checkAccess(uid: string, locationID: string): Promise<void> {
-    try {
-      const locationDoc = await this.customLocationRef.doc(locationID).ref.get();
-      if (!locationDoc.exists) {
-        throw new Error('Location not found');
-      }
-      const owner = locationDoc.data()?.owner;
-      if (owner !== uid) {
-        throw new Error('Access denied');
-      }
-    } catch (error) {
-      throw new Error('Failed to check access: ' + error);
-    }
-  }
 }
 
 export interface CustomLocationData {
@@ -226,17 +300,17 @@ export enum Price {
 }
 
 const defaultCustomLocationData: CustomLocationData = {
-  owner: "default owner",
+  owner: 'default owner',
   location: {
-    name: "default name",
-    createdBy: "default creator",
-    description: "default description",
+    name: 'default name',
+    createdBy: 'default creator',
+    description: 'default description',
     lng: 0,
     lat: 0,
     pictures: [],
-    hours: "default hours",
-    price: "default price",
-    formattedAddress: "default address"
+    hours: 'default hours',
+    price: 'default price',
+    formattedAddress: 'default address'
   },
   comments: []
 };
