@@ -102,6 +102,15 @@ export class AuthenticationService {
     });
   }
 
+  async verifyEmail(newEmail: string): Promise<void> {
+    try {
+      await this.currentUser.value?.verifyBeforeUpdateEmail(newEmail);
+      console.log("Verification email sent to the new email address");
+    } catch (error) {
+      throw error;
+    }
+  }
+
   sendEmailVerification(): Observable<void> {
     return defer(() => {
       return this.currentUser.asObservable().pipe(

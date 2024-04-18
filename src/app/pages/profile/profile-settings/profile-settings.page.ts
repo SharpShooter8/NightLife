@@ -4,6 +4,7 @@ import { FormControl, FormGroup, FormsModule } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { ModalController, ToastController } from '@ionic/angular';
+import {  IonContent } from "@ionic/angular/standalone";
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
 import { UserService } from 'src/app/services/database/user.service';
@@ -13,7 +14,7 @@ import { UserService } from 'src/app/services/database/user.service';
   templateUrl: './profile-settings.page.html',
   styleUrls: ['./profile-settings.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, IonContent]
 })
 export class ProfileSettingsPage implements OnInit {
 
