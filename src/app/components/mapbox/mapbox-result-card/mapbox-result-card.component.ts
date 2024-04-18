@@ -11,7 +11,8 @@ import { Place } from 'src/app/services/foursquare/foursquare.service';
 })
 export class MapboxResultCardComponent  implements OnInit {
 
-  @Input() placeData!: Place;
+  @Input() placeData: Place | null = null;
+
   constructor() { }
 
   ngOnInit() {
@@ -19,7 +20,7 @@ export class MapboxResultCardComponent  implements OnInit {
   }
 
   getPhotoString(): string{
-    if(this.placeData.photos[0] !== undefined){
+    if(this.placeData?.photos[0] !== undefined){
       return this.placeData?.photos[0].prefix + '200x300' + this.placeData?.photos[0]?.suffix;
     }
     return "https://ionicframework.com/docs/img/demos/card-media.png";

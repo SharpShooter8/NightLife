@@ -1,9 +1,8 @@
-#map-container {
-  height: 100%;
-  width: 100%;
-}
-
 #map {
-  height: 100%;
-  width: 100%;
+  width: 85vw;
+  height: 50vh;
+  overflow: hidden;
+  border-radius: 16px;
+  margin-left: auto;
+  margin-right: auto;
 }

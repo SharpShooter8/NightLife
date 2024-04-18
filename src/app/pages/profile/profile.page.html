@@ -4,7 +4,7 @@
       <div class="profile-pic-container">
         <div class="pic-edit-container">
           <div class="pic-container">
-            <img class="profile-pic" [src]="userProfileImage ?? defaultImage">
+            <img class="profile-pic" [src]="userProfileImage">
           </div>
 
           <div class="edit-pic-container">
@@ -14,11 +14,11 @@
           </div>
         </div>
         <div class="profile-stats-container">
-          <div class="follower-container"> 
+          <div class="follower-container">
             <p>4,124</p>
             <p>Followers:</p>
           </div>
-          <div class="clubs-container"> 
+          <div class="clubs-container">
             <p>3</p>
             <p>Clubs:</p>
           </div>
@@ -36,10 +36,10 @@
         </div>
         <div class="profile-sub-info-container">
           <p class="email">{{ userEmail }}</p>
-          <p>{{userBio ?? 'Add info'}} </p>
+          <!-- <p>{{userBio ?? 'Add info'}} </p> -->
           <div class="socials-container">
             <p class="socials-header">Socials: </p>
-          </div> 
+          </div>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
 
     <div class="button-container">
       <ion-button (click)="signOut()">Sign Out</ion-button>
-      <ion-button (click)="editForm()"> Edit Profile</ion-button>
+      <!-- <ion-button (click)="editForm()"> Edit Profile</ion-button> -->
     </div>
   </div>
 </ion-content>

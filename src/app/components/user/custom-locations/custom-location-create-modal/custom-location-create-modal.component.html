@@ -1,0 +1,21 @@
+<ion-content>
+  <form class="login-form" (ngSubmit)="createCustomLocation()">
+    <ion-item class="form-item" lines="none">
+      <ion-input name="name" label="Location Name" labelPlacement="stacked" type="text" [(ngModel)]="name" required></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-input name="description" label="Description" labelPlacement="stacked" type="text" [(ngModel)]="description" required></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-input name="formattedAddress" label="Address" labelPlacement="stacked" type="text" [(ngModel)]="formattedAddress" required></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-input name="hours" label="Hours" labelPlacement="stacked" type="text" [(ngModel)]="hours" required></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-input name="price" label="Price" labelPlacement="stacked" type="text" [(ngModel)]="price" required></ion-input>
+    </ion-item>
+    <ion-button expand="block" type="submit">Create Location</ion-button>
+  </form>
+</ion-content>
+

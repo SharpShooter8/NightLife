@@ -28,11 +28,7 @@ export class ResetPasswordComponent  implements OnInit {
 
   passwordReset():void {
     console.log(this.email);
-    this.auth.resetPassword(this.email).then((p)=>{
-      console.log(p);
-    }).catch((e)=> {
-      console.log(e);
-    })
+    this.auth.resetPassword(this.email).subscribe();
 
     this.resetButtonClicked.emit();
   }

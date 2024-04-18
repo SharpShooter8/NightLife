@@ -1,0 +1,76 @@
+<ion-card id="card-container">
+  @if(shownContent === Content.searching){
+  <ion-card-header id="card-header">
+    <ion-card-title id="card-title">
+      <ion-item>
+        <ion-button (click)="changeContent(Content.friendsList)">
+          <ion-icon id="card-header-button-icon" slot="icon-only" name="arrow-back"></ion-icon>
+        </ion-button>
+        <ion-label id="card-header-title-label">Search For Friend</ion-label>
+      </ion-item>
+      <ion-item>
+        <form class="login-form" (ngSubmit)="searchFriend()">
+          <ion-input name="username" label="Enter Username" labelPlacement="stacked" type="text" [(ngModel)]="searchedUsername" required></ion-input>
+          <ion-button expand="block" type="submit">Find User</ion-button>
+        </form>
+      </ion-item>
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content id="card-content">
+    @if(foundUID !== null){
+    <ion-item class="friend-result-item">
+      <ion-label class="friend-name-label">
+        <h3>UID</h3>
+        <p style="color: white;">{{foundUID}}</p>
+      </ion-label>
+      <ion-button (click)="addFriend()">Add Friend</ion-button>
+    </ion-item>
+    }
+  </ion-card-content>
+  } @else if(shownContent === Content.request){
+  <ion-card-header id="card-header">
+    <ion-card-title id="card-title">
+      <ion-item id="card-header-item" lines="none">
+        <ion-button (click)="changeContent(Content.friendsList)">
+          <ion-icon id="card-header-button-icon" slot="icon-only" name="arrow-back"></ion-icon>
+        </ion-button>
+        <ion-label id="card-header-title-label">Friend Request</ion-label>
+      </ion-item>
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content id="card-content">
+    <ion-list id="card-content-result-list" lines="none">
+      @for(friend of friendRequest; track friend){
+      <ion-item class="friend-result-item">
+        <ion-label class="friend-name-label">{{friend.username}}</ion-label>
+        <ion-button (click)="acceptFriendRequest(friend.uid)">Accept</ion-button>
+        <ion-button (click)="removeFriend(friend.uid)">Decline</ion-button>
+      </ion-item>
+      }
+    </ion-list>
+  </ion-card-content>
+  } @else if(shownContent === Content.friendsList){
+  <ion-card-header id="card-header">
+    <ion-card-title id="card-title">
+      <ion-item id="card-header-item" lines="none">
+        <ion-label id="card-header-title-label">Friends</ion-label>
+        <ion-button id="card-header-search-plan-button" (click)="changeContent(Content.request)" slot="end">
+          <ion-icon id="card-header-button-icon" slot="icon-only" name="mail-unread-outline"></ion-icon>
+        </ion-button>
+        <ion-button id="card-header-search-plan-button" (click)="changeContent(Content.searching)" slot="end">
+          <ion-icon id="card-header-button-icon" slot="icon-only" name="search"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-card-title>
+  </ion-card-header>
+  <ion-card-content id="card-content">
+    <ion-list id="card-content-result-list" lines="none">
+      @for(friend of friends; track friend){
+      <ion-item class="friend-result-item" (click)="showOptionsPopover($event, friend.uid)">
+        <ion-label class="friend-name-label">{{friend.username}}</ion-label>
+      </ion-item>
+      }
+    </ion-list>
+  </ion-card-content>
+  }
+</ion-card>

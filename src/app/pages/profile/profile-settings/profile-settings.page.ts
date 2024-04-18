@@ -41,16 +41,18 @@ export class ProfileSettingsPage implements OnInit {
     this.id = this.user?.uid;
 
     if (this.id) {
-      this.userService.getUserObject(this.id).subscribe(userData => {
-        this.allowLocation = userData.profileInfo.locationAllowed;
-        this.isAccountPrivate = userData.profileInfo.accountPrivate;
-        this.profileBio = userData.profileInfo.bio;
-        this.profileUsername = userData.username;
-      });
+      // this.userService.getUserObject(this.id).subscribe(userData => {
+      //   this.allowLocation = userData.profileInfo.locationAllowed;
+      //   this.isAccountPrivate = userData.profileInfo.accountPrivate;
+      //   this.profileBio = userData.profileInfo.bio;
+      //   this.profileUsername = userData.username;
+      // });
     }
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    let test = 0;
+  }
 
 
   allowLocationChange(){}

@@ -1,79 +1,65 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FoursquareService {
 
-  headers = new HttpHeaders().set('accept', 'application/json').set('Authorization', environment.foursquare.apiKey);
+  private headers = new HttpHeaders()
+    .set('accept', 'application/json')
+    .set('Authorization', environment.foursquare.apiKey);
 
   constructor(private http: HttpClient) { }
 
   placeSearch(query: PlaceSearchQuery): Observable<PlaceSearchResult> {
     const url = `https://api.foursquare.com/v3/places/search`;
-    return this.http.get<PlaceSearchResult>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<PlaceSearchResult>(url, query);
   }
 
   placeDetails(fsq_id: string, query: PlaceDetailsQuery): Observable<Place> {
     const url = `https://api.foursquare.com/v3/places/${fsq_id}`;
-    return this.http.get<Place>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<Place>(url, query);
   }
 
   placePhotos(fsq_id: string, query: PlacePhotosQuery): Observable<Photo[]> {
     const url = `https://api.foursquare.com/v3/places/${fsq_id}/photos`;
-    return this.http.get<Photo[]>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<Photo[]>(url, query);
   }
 
   placeTips(fsq_id: string, query: PlaceTipsQuery): Observable<PlaceTipsResult[]> {
     const url = `https://api.foursquare.com/v3/places/${fsq_id}/tips`;
-    return this.http.get<PlaceTipsResult[]>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<PlaceTipsResult[]>(url, query);
   }
 
   placeMatch(query: PlaceMatchQuery): Observable<Place> {
     const url = `https://api.foursquare.com/v3/places/match`;
-    return this.http.get<Place>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<Place>(url, query);
   }
 
   findNearby(query: FindNearbyQuery): Observable<FindNearbyResult> {
     const url = `https://api.foursquare.com/v3/places/nearby`;
-    return this.http.get<FindNearbyResult>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<FindNearbyResult>(url, query);
   }
 
   autoComplete(query: AutoCompleteQuery): Observable<AutoCompleteResult> {
     const url = `https://api.foursquare.com/v3/autocomplete`;
-    return this.http.get<AutoCompleteResult>(url, {
-      params: query as any,
-      headers: this.headers
-    });
+    return this.makeHttpRequest<AutoCompleteResult>(url, query);
   }
 
   addressDetails(fsq_addr_id: string, query: AddressDetailsQuery): Observable<AddressDetailsResult> {
     const url = `https://api.foursquare.com/v3/address/${fsq_addr_id}`;
-    return this.http.get<AddressDetailsResult>(url, {
+    return this.makeHttpRequest<AddressDetailsResult>(url, query);
+  }
+
+  private makeHttpRequest<T>(url: string, query: any): Observable<T> {
+    const options = {
       params: query as any,
       headers: this.headers
-    });
+    };
+    return this.http.get<T>(url, options);
   }
 }
 
