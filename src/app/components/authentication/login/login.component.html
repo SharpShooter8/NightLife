@@ -1,11 +1,18 @@
-<div class="container">
-  <form class="login-form" (ngSubmit)="login()">
-    <ion-item class="form-item" lines="none">
-      <ion-input name="email" label="Email" labelPlacement="stacked" type="text" [(ngModel)]="email" required></ion-input>
-    </ion-item>
-    <ion-item class="form-item" lines="none">
-      <ion-input name="password" label="Password" labelPlacement="stacked" type="password" [(ngModel)]="password" required></ion-input>
-    </ion-item>
-    <ion-button class="login-button" expand="block" type="submit">Login</ion-button>
-  </form>
-</div>
+  <div class="login-container">
+    <ion-img src="../../../../assets/Designer.png" alt="Instagram Logo" class="logo"></ion-img>
+    <div class="login-form-container">
+      <form class="login-form" (ngSubmit)="login()">
+        <ion-item>
+          <ion-input type="text" placeholder="Email" [(ngModel)]="email" name="email"></ion-input>
+        </ion-item>
+        <br>
+        <ion-item>
+          <ion-input type="password" placeholder="Password" [(ngModel)]="password" name="password"></ion-input>
+        </ion-item>
+        <ion-button expand="block" type="submit">Log In</ion-button>
+      </form>
+    </div>
+  </div>
+
+
+

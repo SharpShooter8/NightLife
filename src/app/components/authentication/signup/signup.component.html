@@ -1,4 +1,4 @@
-<div class="container">
+<!-- <div class="container">
   <form class="signup-form" (ngSubmit)="signup()">
     <ion-item class="form-item" lines="none">
       <ion-input name="username" label="Username" labelPlacement="stacked" type="text" [(ngModel)]="username" required></ion-input>
@@ -11,4 +11,43 @@
     </ion-item>
     <ion-button class="signup-button" expand="block" type="submit">SignUp</ion-button>
   </form>
-</div>
+</div> -->
+
+<!-- <div class="container">
+  <div class="main">
+    <ion-img src="../../../../assets/Designer.png" alt="Instagram Logo" class="logo"></ion-img>
+    <div class="reset-password-container">
+      <form class="reset-password-form">
+        <ion-item>
+          <div class="input-container">
+            <p class="input-label">Reset link will be sent to your email if it exists.</p>
+            <ion-input name="email" placeholder="Email" type="text" [(ngModel)]="email" required></ion-input>
+          </div>
+        </ion-item>
+        <ion-button expand="block" type="submit">Reset Password</ion-button>
+      </form>
+    </div>
+  </div>
+</div> -->
+
+
+  <div class="container">
+    <div class="main">
+      <ion-img src="../../../../assets/Designer.png" alt="Logo" class="logo"></ion-img>
+      <div class="signup-container">
+        <form class="signup-form" (ngSubmit)="signup()">
+          <ion-item>
+            <ion-input name="username" placeholder="Username" type="text" [(ngModel)]="username" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input name="email" placeholder="Email" type="text" [(ngModel)]="email" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-input name="password" placeholder="Password" type="password" [(ngModel)]="password" required></ion-input>
+          </ion-item>
+          <ion-button expand="block" type="submit">Sign Up</ion-button>
+        </form>
+      </div>
+    </div>
+  </div>
+

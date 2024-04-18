@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonInput, IonItem } from "@ionic/angular/standalone";
+import { IonButton, IonInput, IonItem, IonHeader, IonContent, IonImg, IonIcon } from "@ionic/angular/standalone";
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { UserService } from 'src/app/services/database/user.service';
 import { UsernameService } from 'src/app/services/database/username.service';
@@ -10,13 +10,16 @@ import { UsernameService } from 'src/app/services/database/username.service';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.scss'],
   standalone: true,
-  imports:[IonButton, IonItem, IonInput, FormsModule]
+  imports:[IonButton, IonItem, IonInput, FormsModule, IonHeader, IonContent, IonImg, IonIcon]
 })
 export class SignupComponent  implements OnInit {
 
   username:string = "";
   email:string = "";
   password:string = "";
+
+  @Output()
+  signUpClicked = new EventEmitter<void>();
 
   constructor(private userData:UserService, private usernameData: UsernameService, private auth: AuthenticationService) { }
 
@@ -37,6 +40,8 @@ export class SignupComponent  implements OnInit {
     }).catch((e) => {
       console.log(e);
     })
+
+    this.signUpClicked.emit();
   }
 
 }

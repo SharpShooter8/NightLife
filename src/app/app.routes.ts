@@ -34,4 +34,5 @@ export const routes: Routes = [
   },
   { path: '', redirectTo: 'access-portal', pathMatch: 'full' },
   { path: '**', redirectTo: 'access-portal', pathMatch: 'full' },
+
 ];

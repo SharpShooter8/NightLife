@@ -1,5 +1,24 @@
-<ion-content [fullscreen]="true">
-  <app-login></app-login>
-  <app-signup></app-signup>
-  <app-reset-password></app-reset-password>
+<ion-content [fullscreen]="true" class="login-page">
+  <!-- <div class="location-container">USA</div> -->
+  <div class="login-wrapper">
+    <div class="login-content" *ngIf="pageFlag =='login'">
+      <app-login></app-login>
+      <ion-button fill="clear" class="forgot-password" (click)="forgotPasswordPage()">Forgot password?</ion-button>
+    </div>
+    <div class="reset-password-container" *ngIf="pageFlag =='reset-password'">
+      <app-reset-password (resetButtonClicked)="returnLoginPage()"></app-reset-password>
+      <ion-button fill="clear" class="forgot-password" (click)="returnLoginPage()">Return to Login</ion-button>
+    </div>
+    <div class="signup-container" *ngIf="pageFlag =='signup'">
+      <app-signup (signUpClicked)="returnLoginPage()"></app-signup>
+      <ion-button fill="clear" class="forgot-password" (click)="returnLoginPage()">Return to Login</ion-button>
+    </div>
+    <div class="separator" *ngIf="pageFlag =='login' || pageFlag == 'reset-password'">
+      <span>OR</span>
+    </div>
+    <div class="signup-content" *ngIf="pageFlag =='login' || pageFlag == 'reset-password'">
+      <p>Don't have an account?</p>
+      <ion-button fill="clear" type="submit" (click)="signUpPage()">Sign Up</ion-button>
+    </div>
+  </div>
 </ion-content>

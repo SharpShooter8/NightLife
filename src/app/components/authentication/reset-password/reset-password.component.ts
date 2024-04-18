@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonButton, IonInput, IonItem } from "@ionic/angular/standalone";
+import { IonButton, IonInput, IonItem, IonHeader, IonContent, IonImg, IonIcon } from "@ionic/angular/standalone";
+import { NavController } from '@ionic/angular';
+import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 
 
@@ -9,13 +11,16 @@ import { AuthenticationService } from 'src/app/services/authentication/authentic
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.scss'],
   standalone: true,
-  imports: [IonItem, IonInput, IonButton, FormsModule]
+  imports: [IonHeader, IonItem, IonInput, IonButton, FormsModule, IonContent, IonImg, IonIcon]
 })
 export class ResetPasswordComponent  implements OnInit {
 
   email:string = "";
 
-  constructor(private auth: AuthenticationService) { }
+  @Output()
+  resetButtonClicked = new EventEmitter<void>();
+
+  constructor(private auth: AuthenticationService, private navCtrl: NavController) { }
 
   ngOnInit() {
     console.log("Reset Password Component Created");
@@ -28,6 +33,8 @@ export class ResetPasswordComponent  implements OnInit {
     }).catch((e)=> {
       console.log(e);
     })
+
+    this.resetButtonClicked.emit();
   }
 
 

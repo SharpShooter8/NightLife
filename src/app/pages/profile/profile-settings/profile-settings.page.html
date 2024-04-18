@@ -20,7 +20,7 @@
         <ion-label position="floating">Update Username</ion-label>
         <ion-input type="bio" formControlName="username"></ion-input>
       </ion-item>
-      <!-- Add more form fields as needed -->
+      <!-- Add your form fields here -->
       <ion-item>
         <ion-label>Turn on Location</ion-label>
         <ion-toggle [(ngModel)]="allowLocation" formControlName="allowLocationPermission" (ionChange)="allowLocationChange()"></ion-toggle>
@@ -30,6 +30,21 @@
         <ion-toggle [(ngModel)]="isAccountPrivate" formControlName="accountPrivate" (ionChange)="makeAccountPrivate()"></ion-toggle>
       </ion-item>
       <ion-button expand="block" type="submit">Submit</ion-button>
+    </form>
+
+    <form [formGroup] = "accountInfo">
+      <ion-item>
+        <ion-label position="floating">Change Password</ion-label>
+        <ion-input type="bio" formControlName="password"></ion-input>
+      </ion-item>
+      <ion-button (click)="updatePassword()">Change Password</ion-button>
+
+      <ion-item>
+        <ion-label position="floating">Update Email</ion-label>
+        <ion-input type="bio" formControlName="email"></ion-input>
+      </ion-item>
+      <ion-button (click)="updateEmail()">Update Email</ion-button>
+
     </form>
 
   </ion-content>

@@ -7,6 +7,7 @@ import { SignupComponent } from 'src/app/components/authentication/signup/signup
 import { ResetPasswordComponent } from 'src/app/components/authentication/reset-password/reset-password.component';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { Router } from '@angular/router';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-access-portal',
@@ -17,10 +18,28 @@ import { Router } from '@angular/router';
 })
 export class AccessPortalPage implements OnInit {
 
-  constructor(private auth: AuthenticationService, private router: Router) { }
+  protected pageFlag: String;
+
+  constructor(private auth: AuthenticationService, private router: Router, private modalCtrl: ModalController
+  ) {
+    this.pageFlag = 'login'
+  }
 
   ngOnInit() {
     console.log("Created Access Portal");
   }
+
+  forgotPasswordPage(){
+    this.pageFlag = 'reset-password'
+  }
+
+  returnLoginPage(){
+    this.pageFlag = 'login';
+  }
+
+  signUpPage(){
+    this.pageFlag = 'signup'
+  }
+  
 
 }

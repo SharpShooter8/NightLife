@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonInput, IonItem, IonButton } from '@ionic/angular/standalone';
+import { IonInput, IonItem, IonButton, IonContent, IonImg, IonIcon } from '@ionic/angular/standalone';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 
 @Component({
@@ -9,7 +9,7 @@ import { AuthenticationService } from 'src/app/services/authentication/authentic
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
   standalone: true,
-  imports: [IonButton, IonItem, IonInput, FormsModule],
+  imports: [IonIcon, IonImg, IonContent, IonButton, IonItem, IonInput, FormsModule],
 })
 export class LoginComponent implements OnInit {
 
