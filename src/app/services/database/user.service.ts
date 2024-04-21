@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { FieldValue } from '@angular/fire/firestore';
-import { Observable, catchError, defer, first, from, map, of, switchMap, take, tap, throwError } from 'rxjs';
+import { Observable, catchError, defer, from, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +26,7 @@ export class UserService {
               accountPrivate: true,
               locationAllowed: true
             },
+            data: {}
           };
           return from(snapshot.ref.set(userData));
         }),
@@ -128,6 +128,26 @@ export class UserService {
     });
   }
 
+  updatePersonalData(uid: string, newPersonalData: Partial<PersonalData>): Observable<void> {
+    return defer(() => {
+      return this.userRef.doc(uid).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`User Data with uid ${uid} does not exist`);
+          }
+          const currentPersonalData: PersonalData = snapshot.data()?.data as PersonalData;
+          const updatedPersonalData: PersonalData = { ...currentPersonalData, ...newPersonalData };
+          return from(snapshot.ref.update({ settings: updatedPersonalData }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update personal data: ' + error
+          });
+        })
+      );
+    });
+  }
+
   updateMissingUserData(uid: string): Observable<void> {
     return defer(() => {
       return this.userRef.doc(uid).get().pipe(
@@ -152,6 +172,7 @@ export class UserService {
 export interface UserData {
   username: string;
   settings: Settings;
+  data: PersonalData;
 }
 
 export interface Settings {
@@ -159,10 +180,21 @@ export interface Settings {
   locationAllowed: boolean;
 }
 
+export interface PersonalData {
+  home?: Home
+}
+
+export interface Home {
+  formattedAddress: string,
+  lng: string,
+  lat: string
+}
+
 const defaultUserValues: UserData = {
   username: 'defaultUsername',
   settings: {
     accountPrivate: true,
     locationAllowed: true,
-  }
+  },
+  data: {}
 }

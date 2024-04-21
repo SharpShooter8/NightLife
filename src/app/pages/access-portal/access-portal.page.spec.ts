@@ -5,11 +5,11 @@ describe('AccessPortalPage', () => {
   let component: AccessPortalPage;
   let fixture: ComponentFixture<AccessPortalPage>;
 
-  beforeEach(async(() => {
+  beforeEach(async() => {
     fixture = TestBed.createComponent(AccessPortalPage);
     component = fixture.componentInstance;
     fixture.detectChanges();
-  }));
+  });
 
   it('should create', () => {
     expect(component).toBeTruthy();

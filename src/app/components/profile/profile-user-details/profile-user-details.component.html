@@ -1,0 +1,55 @@
+<ion-grid style="width: 100%; height: auto;  background-color: purple; border-radius: 25px; padding: 20px;">
+  <ion-row>
+    <ion-col>
+      <ion-item style="--ion-item-background: transparent;" lines="none">
+        <ion-label style="display: flex; align-items: center; justify-content: center;">
+          <ion-avatar>
+            <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+          </ion-avatar>
+        </ion-label>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row style=" background-color: #ff7954; border-radius: 25px;">
+    <ion-col>
+      <ion-item style="--ion-item-background: transparent; " lines="none">
+        <ion-icon name="person" style="color:white; margin-right: 20px;"></ion-icon>
+        <ion-label>
+          <h1><strong>{{uid | uidToUsername | async}}</strong></h1>
+        </ion-label>
+      </ion-item>
+      <ion-item style="--ion-item-background: transparent; " lines="none">
+        <ion-icon name="people" style="color:white; margin-right: 20px;"></ion-icon>
+        <ion-label>
+          <h2><strong>{{friendCount$ | async}} </strong> Friends</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item style="--ion-item-background: transparent;" lines="none">
+        <ion-icon name="git-branch" style="color:white; margin-right: 20px;"></ion-icon>
+        <ion-label>
+          <h2><strong>{{planCount$ | async}} </strong> Plans</h2>
+        </ion-label>
+      </ion-item>
+      <ion-item style="--ion-item-background: transparent;" lines="none">
+        <ion-icon name="location" style="color:white; margin-right: 20px;"></ion-icon>
+        <ion-label>
+          <h2><strong>{{customLocationCount$ | async}} </strong> Custom Locations</h2>
+        </ion-label>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>
+      <ion-item style="--ion-item-background: #631e50; text-align: center; border-radius: 25px;"
+        lines="none" (click)="settingsPressed.emit()">
+        <ion-label>Settings</ion-label>
+      </ion-item>
+    </ion-col>
+    <ion-col>
+      <ion-item style="--ion-item-background: #a73c5a; text-align: center; border-radius: 25px;"
+        lines="none" (click)="personalPressed.emit()">
+        <ion-label>Personal</ion-label>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+</ion-grid>

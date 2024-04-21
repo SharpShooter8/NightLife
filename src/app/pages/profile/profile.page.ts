@@ -3,65 +3,32 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
-import { UserService } from 'src/app/services/database/user.service'
-import { ImageService } from 'src/app/services/storage/image.service';
-import { environment } from 'src/environments/environment';
+import { ProfileUserDetailsComponent } from 'src/app/components/profile/profile-user-details/profile-user-details.component';
+import { ProfileUserSettingsComponent } from 'src/app/components/profile/profile-user-settings/profile-user-settings.component';
+import { ProfileUserPersonalDataComponent } from 'src/app/components/profile/profile-user-personal-data/profile-user-personal-data.component';
 
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonicModule, CommonModule, FormsModule, ProfileUserDetailsComponent, ProfileUserSettingsComponent, ProfileUserPersonalDataComponent]
 })
 export class ProfilePage implements OnInit {
 
-  userEmail: string | null | undefined = "NA";
-  creationDate: string | undefined = "NA";
-  lastSignedIn: string | undefined = "NA";
-  id: string | null | undefined = "NA";
-  userProfileImage: string | null | undefined;
-  userEmailVerified: boolean | undefined;
+  readonly Content = Content;
+  currentContent = Content.Details;
 
-  protected userService = inject(UserService);
-  protected userObject!: any;
+  constructor(private auth: AuthenticationService) { }
 
-  user: firebase.default.User | null = null;
-
-  constructor(private auth: AuthenticationService, private image: ImageService) { }
-
-  async ngOnInit() {
-    this.user = this.auth.currentUser.getValue();
-    this.userEmail = this.user?.email;
-    this.id = this.user?.uid;
-    this.userEmailVerified = this.user?.emailVerified;
-    if (this.id != null) {
-      this.image.downloadProfileImage(this.id).subscribe(
-        (image) => {
-          this.userProfileImage = image;
-        }
-      );
-    }
-    console.log(this.user?.photoURL);
-    this.creationDate = this.user?.metadata.creationTime;
-    this.lastSignedIn = this.user?.metadata.lastSignInTime;
-    console.log("Current User ID: " + this.id);
-    console.log("Current User Email: " + this.userEmail)
-
+  ngOnInit() {
+    let test = 0;
   }
 
-  async test() {
-  }
+}
 
-  async signOut() {
-    this.auth.signOut().subscribe();
-  }
-
-  async uploadImage(event: any) {
-    if (this.user?.uid) {
-      this.image.uploadProfileImage(event.target.files[0], this.user?.uid).subscribe();
-      this.auth.updateUserProfile({ photoURL: 'images/profile/' + this.user.uid }).subscribe();
-    }
-  }
-
+enum Content {
+  Details = "details",
+  Settings = "settings",
+  Personal = "personal"
 }
