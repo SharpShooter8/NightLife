@@ -1,14 +1,13 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Input, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { Component, Input, OnInit } from '@angular/core';
 import { Place } from 'src/app/services/foursquare/foursquare.service';
+import { IonCard, IonCardHeader, IonImg, IonCardTitle, IonCardSubtitle, IonIcon } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-foursquare-card-large',
   templateUrl: './foursquare-card-large.component.html',
   styleUrls: ['./foursquare-card-large.component.scss'],
   standalone: true,
-  imports: [IonicModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [IonIcon, IonCardSubtitle, IonCardTitle, IonImg, IonCardHeader, IonCard, ],
 })
 export class FoursquareCardLargeComponent implements OnInit {
 

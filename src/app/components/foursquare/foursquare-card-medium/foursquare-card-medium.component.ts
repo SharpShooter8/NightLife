@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonCard, IonImg, IonCardHeader, IonCardTitle, IonCardSubtitle, IonIcon } from '@ionic/angular/standalone';
 import { Place } from 'src/app/services/foursquare/foursquare.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { Place } from 'src/app/services/foursquare/foursquare.service';
   templateUrl: './foursquare-card-medium.component.html',
   styleUrls: ['./foursquare-card-medium.component.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonIcon, IonCardSubtitle, IonCardTitle, IonCardHeader, IonImg, IonCard, ],
 })
 export class FoursquareCardMediumComponent  implements OnInit {
 

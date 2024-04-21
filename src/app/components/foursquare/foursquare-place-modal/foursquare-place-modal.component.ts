@@ -1,13 +1,13 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, Input, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { Place } from 'src/app/services/foursquare/foursquare.service';
+import { IonContent, IonGrid, IonRow, IonCol, IonImg, IonItem, IonText } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-foursquare-place-modal',
   templateUrl: './foursquare-place-modal.component.html',
   styleUrls: ['./foursquare-place-modal.component.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonText, IonItem, IonImg, IonCol, IonRow, IonGrid, IonContent, ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class FoursquarePlaceModalComponent  implements OnInit {

@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonContent, IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon } from '@ionic/angular/standalone';
-import { ToastController } from '@ionic/angular';
+import { IonContent, IonTabs, IonTabBar, IonTabButton, IonLabel, IonIcon, ToastController } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-home',

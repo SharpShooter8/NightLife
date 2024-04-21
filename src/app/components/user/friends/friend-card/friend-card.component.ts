@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
+import { IonCardTitle, IonCard, IonLabel, IonCardHeader, IonButton, IonItem, IonCardContent, IonIcon, IonList } from '@ionic/angular/standalone';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { FriendshipService } from 'src/app/services/database/friendship.service';
 import { UserService } from 'src/app/services/database/user.service';
@@ -13,7 +13,7 @@ import { FriendOptionsPopoverComponent } from '../friend-options-popover/friend-
   templateUrl: './friend-card.component.html',
   styleUrls: ['./friend-card.component.scss'],
   standalone: true,
-  imports: [IonicModule, FormsModule],
+  imports: [IonList, IonIcon, IonCardContent, IonItem, IonButton, IonCardHeader, IonLabel, IonCard, IonCardTitle, FormsModule],
 })
 export class FriendCardComponent implements OnInit {
 

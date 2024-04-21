@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
-import { IonicModule, PopoverController } from '@ionic/angular'
+import { PopoverController, IonGrid, IonRow, IonCol, IonItem, IonLabel, IonChip, IonAvatar, IonIcon, IonText, IonBadge } from '@ionic/angular/standalone'
 import { PlanData, PlanService, Role } from 'src/app/services/database/plan.service';
 import { FoursquareService, Photo, Place } from 'src/app/services/foursquare/foursquare.service';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
@@ -15,7 +15,7 @@ import { SwiperContainer } from 'swiper/element';
   templateUrl: './mapbox-plan-details.component.html',
   styleUrls: ['./mapbox-plan-details.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, UidToUsernamePipe, FsqidToPlacePipe, IdToCustomLocationPipe],
+  imports: [IonBadge, IonText, IonIcon, IonAvatar, IonChip, IonLabel, IonItem, IonCol, IonRow, IonGrid, CommonModule, UidToUsernamePipe, FsqidToPlacePipe, IdToCustomLocationPipe],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MapboxPlanDetailsComponent implements OnInit, AfterViewInit {

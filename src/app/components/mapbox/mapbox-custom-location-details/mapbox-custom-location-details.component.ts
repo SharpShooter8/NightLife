@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { CustomLocationData, CustomLocationService } from 'src/app/services/database/custom-location.service';
+import { IonGrid, IonRow, IonCol, IonLabel, IonIcon, IonBadge, IonImg, IonThumbnail } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-custom-location-details',
   templateUrl: './mapbox-custom-location-details.component.html',
   styleUrls: ['./mapbox-custom-location-details.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
+  imports: [IonImg, IonBadge, IonIcon, IonLabel, IonCol, IonRow, IonGrid, IonThumbnail, CommonModule],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MapboxCustomLocationDetailsComponent implements OnInit {

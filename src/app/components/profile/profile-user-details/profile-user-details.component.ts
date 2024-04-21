@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
+import { IonGrid, IonCol, IonItem, IonAvatar, IonLabel, IonRow, IonIcon } from '@ionic/angular/standalone'
 import { Observable, map } from 'rxjs';
 import { UidToUsernamePipe } from 'src/app/pipes/uid-to-username.pipe';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
@@ -13,7 +13,7 @@ import { PlanService } from 'src/app/services/database/plan.service';
   templateUrl: './profile-user-details.component.html',
   styleUrls: ['./profile-user-details.component.scss'],
   standalone: true,
-  imports: [IonicModule, UidToUsernamePipe, CommonModule]
+  imports: [IonIcon, IonRow, IonLabel, IonAvatar, IonItem, IonCol, IonGrid, UidToUsernamePipe, CommonModule]
 })
 export class ProfileUserDetailsComponent implements OnInit {
 

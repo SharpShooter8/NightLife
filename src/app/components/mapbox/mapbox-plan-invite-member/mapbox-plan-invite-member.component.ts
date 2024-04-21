@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
 import { CommonModule } from '@angular/common';
 import { PlanData, PlanService, Role } from 'src/app/services/database/plan.service';
 import { FriendshipService } from 'src/app/services/database/friendship.service';
@@ -9,13 +8,14 @@ import { UidToUsernamePipe } from 'src/app/pipes/uid-to-username.pipe';
 import { UsernameService } from 'src/app/services/database/username.service';
 import { UserService } from 'src/app/services/database/user.service';
 import { HideOnClickDirective } from 'src/app/directives/hide-on-click.directive';
+import { IonItem, IonIcon, IonList, IonListHeader, IonInput, IonLabel, IonChip, IonAvatar } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-plan-invite-member',
   templateUrl: './mapbox-plan-invite-member.component.html',
   styleUrls: ['./mapbox-plan-invite-member.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, UidToUsernamePipe, HideOnClickDirective]
+  imports: [IonAvatar, IonChip, IonLabel, IonInput, IonListHeader, IonList, IonIcon, IonItem, CommonModule, UidToUsernamePipe, HideOnClickDirective]
 })
 export class MapboxPlanInviteMemberComponent implements OnInit {
 

@@ -1,5 +1,4 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { FoursquareCardSmallComponent } from '../foursquare-card-small/foursquare-card-small.component';
 import { FoursquareCardMediumComponent } from '../foursquare-card-medium/foursquare-card-medium.component';
 import { FoursquareCardLargeComponent } from '../foursquare-card-large/foursquare-card-large.component';
@@ -10,7 +9,7 @@ import { Place } from 'src/app/services/foursquare/foursquare.service';
   templateUrl: './foursquare-swipe.component.html',
   styleUrls: ['./foursquare-swipe.component.scss'],
   standalone: true,
-  imports: [IonicModule, FoursquareCardSmallComponent, FoursquareCardMediumComponent, FoursquareCardLargeComponent],
+  imports: [FoursquareCardSmallComponent, FoursquareCardMediumComponent, FoursquareCardLargeComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class FoursquareSwipeComponent implements OnInit {

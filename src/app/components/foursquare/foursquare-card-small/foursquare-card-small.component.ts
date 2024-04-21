@@ -1,13 +1,13 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { Place } from 'src/app/services/foursquare/foursquare.service';
+import { IonCard, IonImg, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-foursquare-card-small',
   templateUrl: './foursquare-card-small.component.html',
   styleUrls: ['./foursquare-card-small.component.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonIcon, IonCardTitle, IonCardSubtitle, IonCardHeader, IonImg, IonCard, ],
 })
 export class FoursquareCardSmallComponent  implements OnInit {
 

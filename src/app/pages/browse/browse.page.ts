@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonContent, IonSearchbar, IonRow, IonCol } from '@ionic/angular/standalone';
 import { FoursquareSwipeComponent } from 'src/app/components/foursquare/foursquare-swipe/foursquare-swipe.component';
 import { FoursquareService, Place } from 'src/app/services/foursquare/foursquare.service';
 import { firstValueFrom } from 'rxjs';
@@ -16,7 +16,7 @@ import { FoursquarePlaceModalComponent } from 'src/app/components/foursquare/fou
   templateUrl: './browse.page.html',
   styleUrls: ['./browse.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FoursquareSwipeComponent, FoursquareCardSmallComponent, FoursquareCardMediumComponent, FoursquareCardLargeComponent]
+  imports: [IonContent, IonSearchbar, IonRow, IonCol, CommonModule, FormsModule, FoursquareSwipeComponent, FoursquareCardSmallComponent, FoursquareCardMediumComponent, FoursquareCardLargeComponent]
 })
 export class BrowsePage implements OnInit {
 

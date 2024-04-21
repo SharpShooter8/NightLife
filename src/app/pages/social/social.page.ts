@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonContent } from '@ionic/angular/standalone';
 import { FriendCardComponent } from 'src/app/components/user/friends/friend-card/friend-card.component';
 
 @Component({
@@ -9,7 +9,7 @@ import { FriendCardComponent } from 'src/app/components/user/friends/friend-card
   templateUrl: './social.page.html',
   styleUrls: ['./social.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, FriendCardComponent]
+  imports: [IonContent, CommonModule, FormsModule, FriendCardComponent]
 })
 export class SocialPage implements OnInit {
 

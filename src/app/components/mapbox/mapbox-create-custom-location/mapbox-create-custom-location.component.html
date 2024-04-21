@@ -26,7 +26,7 @@
         <ion-datetime-button datetime="locationDate"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="locationDate" presentation="date" [formatOptions]="dateTimeButtonFormat"
+            <ion-datetime id="locationDate" presentation="date"
               [(ngModel)]="locationData.date" [ngModelOptions]="{standalone: true}">
             </ion-datetime>
           </ng-template>
@@ -39,7 +39,7 @@
         <ion-datetime-button datetime="locationStartTime"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="locationStartTime" presentation="time" [formatOptions]="dateTimeButtonFormat"
+            <ion-datetime id="locationStartTime" presentation="time"
               [(ngModel)]="locationData.hours.start" [ngModelOptions]="{standalone: true}">
             </ion-datetime>
           </ng-template>
@@ -52,7 +52,7 @@
         <ion-datetime-button datetime="locationEndTime"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="locationEndTime" presentation="time" [formatOptions]="dateTimeButtonFormat"
+            <ion-datetime id="locationEndTime" presentation="time"
               [(ngModel)]="locationData.hours.end" [ngModelOptions]="{standalone: true}">
             </ion-datetime>
           </ng-template>

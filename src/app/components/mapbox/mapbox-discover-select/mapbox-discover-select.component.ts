@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { IonItem, IonLabel, IonList, IonImg, IonThumbnail } from '@ionic/angular/standalone'
 import { Observable, map } from 'rxjs';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { CustomLocationData } from 'src/app/services/database/custom-location.service';
@@ -11,12 +11,11 @@ import { FoursquareService, Photo, Place, PlaceSearchQuery } from 'src/app/servi
   templateUrl: './mapbox-discover-select.component.html',
   styleUrls: ['./mapbox-discover-select.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [IonImg, IonList, IonLabel, IonItem, CommonModule, IonThumbnail],
 })
-export class MapboxDiscoverSelectComponent  implements OnInit {
+export class MapboxDiscoverSelectComponent implements OnInit {
 
-  @Output() selectedPlace: EventEmitter<Place | {id: string, data: CustomLocationData}> = new EventEmitter<Place | {id: string, data: CustomLocationData}>();
+  @Output() selectedPlace: EventEmitter<Place | { id: string, data: CustomLocationData }> = new EventEmitter<Place | { id: string, data: CustomLocationData }>();
 
   places$: Observable<Place[]>;
   placeSearchQuery: PlaceSearchQuery = {

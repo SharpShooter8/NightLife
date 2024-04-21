@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import { IonContent } from '@ionic/angular/standalone';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { ProfileUserDetailsComponent } from 'src/app/components/profile/profile-user-details/profile-user-details.component';
 import { ProfileUserSettingsComponent } from 'src/app/components/profile/profile-user-settings/profile-user-settings.component';
@@ -12,7 +12,7 @@ import { ProfileUserPersonalDataComponent } from 'src/app/components/profile/pro
   templateUrl: './profile.page.html',
   styleUrls: ['./profile.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, ProfileUserDetailsComponent, ProfileUserSettingsComponent, ProfileUserPersonalDataComponent]
+  imports: [IonContent, CommonModule, FormsModule, ProfileUserDetailsComponent, ProfileUserSettingsComponent, ProfileUserPersonalDataComponent]
 })
 export class ProfilePage implements OnInit {
 

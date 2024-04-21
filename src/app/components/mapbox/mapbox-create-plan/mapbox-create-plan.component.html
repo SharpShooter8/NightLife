@@ -18,8 +18,8 @@
         <ion-datetime-button datetime="startDate"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="startDate" presentation="date-time" [value]="startDate"
-              [formatOptions]="dateTimeButtonFormat" [(ngModel)]="startDate" [ngModelOptions]="{standalone: true}">
+            <ion-datetime id="startDate" presentation="date-time" [value]="startDate" [(ngModel)]="startDate"
+              [ngModelOptions]="{standalone: true}">
             </ion-datetime>
           </ng-template>
         </ion-modal>
@@ -31,8 +31,8 @@
         <ion-datetime-button datetime="endDate"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="endDate" presentation="date-time" [value]="endDate" [formatOptions]="dateTimeButtonFormat"
-              [(ngModel)]="endDate" [ngModelOptions]="{standalone: true}">
+            <ion-datetime id="endDate" presentation="date-time" [value]="endDate" [(ngModel)]="endDate"
+              [ngModelOptions]="{standalone: true}">
             </ion-datetime>
           </ng-template>
         </ion-modal>

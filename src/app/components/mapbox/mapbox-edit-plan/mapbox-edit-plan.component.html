@@ -26,8 +26,7 @@
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
             <ion-datetime id="startDate" presentation="date-time" [value]="plan.data.startDate"
-              [formatOptions]="timeButtonFormat" showDefaultButtons="true"
-              (ionChange)="updatePlanStartDateInput($event.detail.value)"></ion-datetime>
+              showDefaultButtons="true" (ionChange)="updatePlanStartDateInput($event.detail.value)"></ion-datetime>
           </ng-template>
         </ion-modal>
       </ion-label>
@@ -38,8 +37,7 @@
         <ion-datetime-button datetime="endDate"></ion-datetime-button>
         <ion-modal [keepContentsMounted]="true">
           <ng-template>
-            <ion-datetime id="endDate" presentation="date-time" [value]="plan.data.endDate"
-              [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+            <ion-datetime id="endDate" presentation="date-time" [value]="plan.data.endDate" showDefaultButtons="true"
               (ionChange)="updatePlanEndDateInput($event.detail.value)"></ion-datetime>
           </ng-template>
         </ion-modal>
@@ -51,7 +49,8 @@
       <ion-label>
         <ion-item>
           <h1>Members</h1>
-          <ion-icon slot="end" name="mail" style="color: white; font-size: xx-large;" (click)="invitePressed.emit(plan)"></ion-icon>
+          <ion-icon slot="end" name="mail" style="color: white; font-size: xx-large;"
+            (click)="invitePressed.emit(plan)"></ion-icon>
         </ion-item>
         <ion-list style="width: 100%; max-height: 200px; overflow: scroll;">
           @for(member of plan.data.members; track member){
@@ -122,8 +121,8 @@
                   <ion-datetime-button [datetime]="location.locationID + 'StartDate'"></ion-datetime-button>
                   <ion-modal [keepContentsMounted]="true">
                     <ng-template>
-                      <ion-datetime [id]="location.locationID + 'StartDate'" presentation="date-time" [value]="location.startDate"
-                        [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+                      <ion-datetime [id]="location.locationID + 'StartDate'" presentation="date-time"
+                        [value]="location.startDate" showDefaultButtons="true"
                         (ionChange)="updatePlanLocationStartDate(location.locationID, $event.detail.value)"></ion-datetime>
                     </ng-template>
                   </ion-modal>
@@ -135,8 +134,8 @@
                   <ion-datetime-button [datetime]="location.locationID + 'EndDate'"></ion-datetime-button>
                   <ion-modal [keepContentsMounted]="true">
                     <ng-template>
-                      <ion-datetime [id]="location.locationID + 'EndDate'" presentation="date-time" [value]="location.endDate"
-                        [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+                      <ion-datetime [id]="location.locationID + 'EndDate'" presentation="date-time"
+                        [value]="location.endDate" showDefaultButtons="true"
                         (ionChange)="updatePlanLocationEndDate(location.locationID, $event.detail.value)"></ion-datetime>
                     </ng-template>
                   </ion-modal>

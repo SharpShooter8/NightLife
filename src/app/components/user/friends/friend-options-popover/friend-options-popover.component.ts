@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { PopoverController } from '@ionic/angular/standalone';
-import { IonicModule } from '@ionic/angular';
+import { PopoverController, IonContent, IonItem, IonButton, IonAccordionGroup, IonAccordion, IonLabel } from '@ionic/angular/standalone';
 import { FriendshipService } from 'src/app/services/database/friendship.service';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { Member, PlanData, PlanService, Role } from 'src/app/services/database/plan.service';
@@ -10,7 +9,7 @@ import { Member, PlanData, PlanService, Role } from 'src/app/services/database/p
   templateUrl: './friend-options-popover.component.html',
   styleUrls: ['./friend-options-popover.component.scss'],
   standalone: true,
-  imports: [IonicModule]
+  imports: [IonLabel, IonAccordion, IonAccordionGroup, IonButton, IonItem, IonContent]
 })
 export class FriendOptionsPopoverComponent implements OnInit {
 

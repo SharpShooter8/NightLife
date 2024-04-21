@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { PlanData, PlanService, Role } from 'src/app/services/database/plan.service';
+import { IonThumbnail, IonItem, IonLabel, IonIcon, IonList, IonItemSliding, IonImg, IonItemOptions, IonItemOption } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-plans-select',
   templateUrl: './mapbox-plans-select.component.html',
   styleUrls: ['./mapbox-plans-select.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [IonThumbnail, IonItemOption, IonItemOptions, IonImg, IonItemSliding, IonList, IonIcon, IonLabel, IonItem, CommonModule],
 })
 export class MapboxPlansSelectComponent implements OnInit {
 

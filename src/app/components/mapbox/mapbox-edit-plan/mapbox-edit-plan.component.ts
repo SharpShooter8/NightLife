@@ -1,18 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { Member, PlanData, PlanService, Role, rolePrecedence } from 'src/app/services/database/plan.service';
 import { UidToUsernamePipe } from "../../../pipes/uid-to-username.pipe";
-import { Observable, concat, forkJoin } from 'rxjs';
+import { Observable, concat } from 'rxjs';
+import { IonLabel, IonDatetimeButton, IonModal, IonDatetime, IonItem, IonIcon, IonItemSliding, IonList, IonChip, IonAvatar, IonItemOptions, IonItemOption, IonAccordionGroup, IonAccordion, IonSelect, IonSelectOption, IonInput } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-edit-plan',
   templateUrl: './mapbox-edit-plan.component.html',
   styleUrls: ['./mapbox-edit-plan.component.scss'],
   standalone: true,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [IonicModule, CommonModule, UidToUsernamePipe]
+  imports: [IonInput, IonSelect, IonSelectOption, IonAccordion, IonAccordionGroup, IonItemOption, IonItemOptions, IonAvatar, IonChip, IonList, IonItemSliding, IonIcon, IonItem, IonDatetime, IonModal, IonDatetimeButton, IonLabel, CommonModule, UidToUsernamePipe]
 })
 export class MapboxEditPlanComponent implements OnInit {
   readonly Role = Role;

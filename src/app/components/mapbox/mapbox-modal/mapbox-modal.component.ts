@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, OnInit } from '@angular/core';
-import { IonicModule, ModalController, SegmentValue } from '@ionic/angular'
+import { Component, OnInit } from '@angular/core';
+import { ModalController, SegmentValue, IonSegment, IonSegmentButton, IonLabel } from '@ionic/angular/standalone'
 import { CommonModule } from '@angular/common';
 import { MapboxPlanDetailsComponent } from '../mapbox-plan-details/mapbox-plan-details.component';
 import { MapboxLocationDetailsComponent } from '../mapbox-location-details/mapbox-location-details.component';
@@ -20,7 +20,7 @@ import { MapboxAddToPlanComponent } from '../mapbox-add-to-plan/mapbox-add-to-pl
   templateUrl: './mapbox-modal.component.html',
   styleUrls: ['./mapbox-modal.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, MapboxPlanDetailsComponent,
+  imports: [IonSegment, IonLabel, IonSegmentButton, CommonModule, MapboxPlanDetailsComponent,
     MapboxLocationDetailsComponent, MapboxCustomLocationDetailsComponent,
     MapboxDiscoverSelectComponent, MapboxPlansSelectComponent,
     MapboxCustomLocationsSelectComponent, MapboxPlanInvitesSelectComponent,
@@ -28,7 +28,6 @@ import { MapboxAddToPlanComponent } from '../mapbox-add-to-plan/mapbox-add-to-pl
     MapboxCreateCustomLocationComponent, MapboxEditCustomLocationComponent,
     MapboxAddToPlanComponent,
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MapboxModalComponent implements OnInit {
   readonly Content = Content;

@@ -13,6 +13,7 @@ import { getStorage, provideStorage } from '@angular/fire/storage'
 import { AngularFireModule } from '@angular/fire/compat'
 import { HttpClientModule } from '@angular/common/http';
 import { initialize } from '@ionic/core';
+import { IonicModule } from '@ionic/angular';
 
 if (environment.production) {
   enableProdMode();
@@ -23,12 +24,14 @@ bootstrapApplication(AppComponent, {
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideIonicAngular(),
     provideRouter(routes),
+    // importProvidersFrom(IonicModule.forRoot({})),
     importProvidersFrom(HttpClientModule),
     importProvidersFrom(provideFirebaseApp(() => initializeApp(environment.firebase))),
     importProvidersFrom(provideAuth(() => getAuth())),
     importProvidersFrom(provideFirestore(() => getFirestore())),
     importProvidersFrom(provideStorage(() => getStorage())),
-    importProvidersFrom(AngularFireModule.initializeApp(environment.firebase)), importProvidersFrom(provideFirebaseApp(() => initializeApp({
+    importProvidersFrom(AngularFireModule.initializeApp(environment.firebase)),
+    importProvidersFrom(provideFirebaseApp(() => initializeApp({
       "projectId": "night-life-7e16c",
       "appId": "1:554954113971:web:3ead37c406677936e2c1c6",
       "storageBucket": "night-life-7e16c.appspot.com",
@@ -36,6 +39,10 @@ bootstrapApplication(AppComponent, {
       "apiKey": "AIzaSyBriG8Aeqm_mftxZ4F8cXRovQNKAT8R9Os",
       "authDomain": "night-life-7e16c.firebaseapp.com",
       "messagingSenderId": "554954113971",
-      "measurementId": "G-HKZ8BFB43M" }))), importProvidersFrom(provideAuth(() => getAuth())), importProvidersFrom(provideFirestore(() => getFirestore())), importProvidersFrom(provideStorage(() => getStorage())),
+      "measurementId": "G-HKZ8BFB43M"
+    }))),
+    importProvidersFrom(provideAuth(() => getAuth())),
+    importProvidersFrom(provideFirestore(() => getFirestore())),
+    importProvidersFrom(provideStorage(() => getStorage())),
   ]
 });

@@ -1,16 +1,16 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular'
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { PlanData, PlanService } from 'src/app/services/database/plan.service';
+import { IonLabel, IonItem, IonIcon, IonDatetimeButton, IonModal, IonDatetime } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-create-plan',
   templateUrl: './mapbox-create-plan.component.html',
   styleUrls: ['./mapbox-create-plan.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule]
+  imports: [IonModal, IonDatetimeButton, IonIcon, IonItem, IonLabel, IonDatetime, CommonModule, FormsModule]
 })
 export class MapboxCreatePlanComponent implements OnInit {
 

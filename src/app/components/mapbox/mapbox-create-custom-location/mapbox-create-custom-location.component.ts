@@ -1,15 +1,15 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { CustomLocationData, CustomLocationService, Location, Price } from 'src/app/services/database/custom-location.service';
 import { FormsModule } from '@angular/forms';
+import { IonCheckbox, IonItem, IonLabel, IonIcon, IonDatetimeButton, IonModal, IonButton, IonDatetime, IonSelectOption } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-create-custom-location',
   templateUrl: './mapbox-create-custom-location.component.html',
   styleUrls: ['./mapbox-create-custom-location.component.scss'],
   standalone: true,
-  imports: [IonicModule, FormsModule]
+  imports: [IonCheckbox, IonButton, IonModal, IonDatetimeButton, IonIcon, IonLabel, IonItem, FormsModule, IonDatetime, IonSelectOption]
 })
 export class MapboxCreateCustomLocationComponent implements OnInit {
   readonly Price = Price;
@@ -53,6 +53,8 @@ export class MapboxCreateCustomLocationComponent implements OnInit {
 
   createCustomLocation() {
     const uid = this.authService.currentUser.value?.uid;
+    console.log(this.locationData);
+
     if (!uid || !this.locationData.name || !this.locationData.description || !this.locationData.formattedAddress || !this.locationData.hours || !this.locationData.price) {
       return;
     }

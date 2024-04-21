@@ -1,19 +1,19 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
-import { Observable, concat, map, tap } from 'rxjs';
+import { Observable, concat, tap } from 'rxjs';
 import { HideOnClickDirective } from 'src/app/directives/hide-on-click.directive';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { CustomLocationData } from 'src/app/services/database/custom-location.service';
 import { Location, LocationType, PlanData, PlanService, Role, rolePrecedence } from 'src/app/services/database/plan.service';
 import { Place } from 'src/app/services/foursquare/foursquare.service';
+import { IonItem, IonCheckbox, IonList, IonLabel, IonIcon } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-add-to-plan',
   templateUrl: './mapbox-add-to-plan.component.html',
   styleUrls: ['./mapbox-add-to-plan.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, HideOnClickDirective]
+  imports: [IonIcon, IonLabel, IonList, IonCheckbox, IonItem, CommonModule, HideOnClickDirective]
 })
 export class MapboxAddToPlanComponent implements OnInit {
 

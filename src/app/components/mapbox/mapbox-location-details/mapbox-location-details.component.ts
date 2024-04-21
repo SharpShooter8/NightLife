@@ -1,5 +1,5 @@
 import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { IonicModule, PopoverController } from '@ionic/angular'
+import { PopoverController, IonGrid, IonRow, IonCol, IonImg, IonThumbnail, IonLabel, IonIcon, IonItem, IonText } from '@ionic/angular/standalone'
 import { Photo, Place } from 'src/app/services/foursquare/foursquare.service';
 
 @Component({
@@ -7,7 +7,7 @@ import { Photo, Place } from 'src/app/services/foursquare/foursquare.service';
   templateUrl: './mapbox-location-details.component.html',
   styleUrls: ['./mapbox-location-details.component.scss'],
   standalone: true,
-  imports: [IonicModule],
+  imports: [IonText, IonItem, IonIcon, IonLabel, IonImg, IonCol, IonRow, IonGrid, IonThumbnail],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class MapboxLocationDetailsComponent implements OnInit {

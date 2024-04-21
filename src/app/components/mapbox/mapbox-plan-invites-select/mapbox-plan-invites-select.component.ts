@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { PlanData, PlanService } from 'src/app/services/database/plan.service';
+import { IonItem, IonLabel, IonIcon, IonList, IonItemSliding, IonImg, IonItemOptions, IonItemOption, IonThumbnail } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-plan-invites-select',
   templateUrl: './mapbox-plan-invites-select.component.html',
   styleUrls: ['./mapbox-plan-invites-select.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [IonThumbnail, IonItemOption, IonItemOptions, IonImg, IonItemSliding, IonList, IonIcon, IonLabel, IonItem, CommonModule],
 })
 export class MapboxPlanInvitesSelectComponent implements OnInit {
 
@@ -40,12 +39,12 @@ export class MapboxPlanInvitesSelectComponent implements OnInit {
     return Math.round(differenceDays);
   }
 
-  acceptPlanInvite(planInvite: { id: string, data: PlanData }){
+  acceptPlanInvite(planInvite: { id: string, data: PlanData }) {
     const uid = this.authService.currentUser.value?.uid as string;
     this.planService.acceptPlanInvite(uid, planInvite.id).subscribe();
   }
 
-  declinePlanInvite(planInvite: { id: string, data: PlanData }){
+  declinePlanInvite(planInvite: { id: string, data: PlanData }) {
     const uid = this.authService.currentUser.value?.uid as string;
     this.planService.rejectPlanInvite(uid, planInvite.id).subscribe();
   }

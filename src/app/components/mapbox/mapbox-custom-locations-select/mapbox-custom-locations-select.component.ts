@@ -1,17 +1,16 @@
 import { CommonModule } from '@angular/common';
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, OnInit, Output } from '@angular/core';
-import { IonicModule } from '@ionic/angular'
+import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { CustomLocationData, CustomLocationService } from 'src/app/services/database/custom-location.service';
+import { IonItem, IonLabel, IonIcon, IonList, IonItemSliding, IonImg, IonItemOption, IonItemOptions, IonThumbnail } from "@ionic/angular/standalone";
 
 @Component({
   selector: 'app-mapbox-custom-locations-select',
   templateUrl: './mapbox-custom-locations-select.component.html',
   styleUrls: ['./mapbox-custom-locations-select.component.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA]
+  imports: [IonThumbnail, IonItemOptions, IonItemOption, IonImg, IonItemSliding, IonList, IonIcon, IonLabel, IonItem, CommonModule],
 })
 export class MapboxCustomLocationsSelectComponent implements OnInit {
 
