@@ -4,7 +4,6 @@ import { IonicModule } from '@ionic/angular';
 import { FriendshipService } from 'src/app/services/database/friendship.service';
 import { AuthenticationService } from 'src/app/services/authentication/authentication.service';
 import { Member, PlanData, PlanService, Role } from 'src/app/services/database/plan.service';
-import { Observable, forkJoin, map } from 'rxjs';
 
 @Component({
   selector: 'app-friend-options-popover',
@@ -40,19 +39,14 @@ export class FriendOptionsPopoverComponent implements OnInit {
     this.plans = [];
     const uid = this.authService.currentUser.value?.uid as string;
     this.planService.getUserPlans(uid).subscribe(
-      (planIDs) => {
-        planIDs.forEach(id => {
-          this.planService.getPlanData(uid, id).subscribe(
-            (data) => {
-              const member = (data.members as Member[]).find(member => member.uid === uid);
-              if (member && (member.role === Role.CoOwner || member?.role === Role.Owner)) {
-                this.plans.push({ id, data })
-              }
-            }
-          );
+      (plans) => {
+        plans.forEach(plan => {
+          const member = (plan.data.members as Member[]).find(member => member.uid === uid);
+          if (member && (member.role === Role.CoOwner || member?.role === Role.Owner)) {
+            this.plans.push(plan);
+          }
         });
-      }
-    );
+      });
   }
 
   async inviteFriendToPlan(planID: string) {

@@ -1,0 +1,19 @@
+<div class="container">
+  <ion-item style="--ion-item-background:transparent;" lines="none">
+    <ion-icon name="arrow-back" (click)="backPressed.emit()" style="margin-right: 10px;"></ion-icon>
+    <h1 style="font-size: xx-large;">Add To Plan</h1>
+  </ion-item>
+  @if(showAddLocation){
+  <ion-item lines="none" (click)="addLocationToPlans()"
+    style="--ion-item-background: lightgreen; border-radius: 25px; width: 95%; margin: auto; margin-bottom: 15px; text-align: center;">
+    <ion-label>Add Location</ion-label>
+  </ion-item>
+  }
+  <ion-list style="--ion-item-background: #CF9FFF; border-radius: 25px; padding: 10px;" lines="none">
+    @for(plan of plans$ | async; track plan){
+    @if(canAddToPlan(plan)){
+    <ion-checkbox (ionChange)="handleCheckboxChange(plan, $event.detail.checked)">{{plan.data.name}}</ion-checkbox>
+    }
+    }
+  </ion-list>
+</div>

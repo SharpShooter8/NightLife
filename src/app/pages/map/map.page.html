@@ -1,4 +1,8 @@
-<ion-content class="ion-padding">
+<ion-content>
+  @if(!isModalOpen){
+    <div class="circle-button" (click)="openModal()">
+      <ion-icon name="add-circle" class="icon"></ion-icon>
+    </div>
+  }
   <app-mapbox-map (coords)="updateResults($event)"></app-mapbox-map>
-  <app-mapbox-card></app-mapbox-card>
 </ion-content>

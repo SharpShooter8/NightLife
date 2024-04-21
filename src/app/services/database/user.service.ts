@@ -150,13 +150,13 @@ export class UserService {
 }
 
 export interface UserData {
-  username: FieldValue | string;
-  settings: FieldValue | Settings;
+  username: string;
+  settings: Settings;
 }
 
 export interface Settings {
-  accountPrivate: FieldValue | boolean;
-  locationAllowed: FieldValue | boolean;
+  accountPrivate: boolean;
+  locationAllowed: boolean;
 }
 
 const defaultUserValues: UserData = {

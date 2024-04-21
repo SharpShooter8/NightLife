@@ -197,9 +197,9 @@ export class FriendshipService {
 }
 
 export interface FriendshipData {
-  user1: FieldValue | string;
-  user2: FieldValue | string;
-  status: FieldValue | FriendRequestStatus;
+  user1: string;
+  user2: string;
+  status: FriendRequestStatus;
 }
 
 export enum FriendRequestStatus {

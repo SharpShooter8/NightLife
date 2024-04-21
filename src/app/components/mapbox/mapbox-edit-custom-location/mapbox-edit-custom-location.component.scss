@@ -1,0 +1,15 @@
+.container {
+  background-color: #483D8B;
+  padding: 25px;
+  border-radius: 25px;
+
+  .edit-form {
+    background-color: transparent;
+
+    .form-item {
+      --ion-item-background: #003366;
+      margin-bottom: 10px;
+      border-radius: 25px;
+    }
+  }
+}

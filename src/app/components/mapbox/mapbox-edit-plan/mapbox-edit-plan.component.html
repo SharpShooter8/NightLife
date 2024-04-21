@@ -1,0 +1,157 @@
+<div class="container">
+  <ion-item style="--ion-item-background:transparent;" lines="none">
+    <ion-label>
+      <ion-item lines="none">
+        <ion-icon name="arrow-back" (click)="backPressed.emit()"></ion-icon>
+        <h1 style="font-size: xx-large;">Edit {{plan.data.name}}</h1>
+      </ion-item>
+    </ion-label>
+  </ion-item>
+  <ion-item lines="none" (click)="confirmEdits()"
+    style="--ion-item-background: orange; border-radius: 25px; width: 95%; margin: auto; text-align: center; margin-bottom: 10px;">
+    <ion-label>ConfirmEdits</ion-label>
+  </ion-item>
+  <ion-list style="background-color: navy; border-radius: 25px; padding: 10px;" lines="none">
+    @if(hasPermission(Role.Owner)){
+    <ion-item class="input-item">
+      <ion-input [label]="plan.data.name" label-placement="floating" fill="outline" placeholder="Enter new name"
+        (ionInput)="updatePlanNameInput($event.detail.value)"></ion-input>
+    </ion-item>
+    }
+    @if(hasPermission(Role.CoOwner)){
+    <ion-item class="input-item">
+      <ion-label>
+        <h2>Start Date</h2>
+        <ion-datetime-button datetime="startDate"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="startDate" presentation="date-time" [value]="plan.data.startDate"
+              [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+              (ionChange)="updatePlanStartDateInput($event.detail.value)"></ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    <ion-item class="input-item">
+      <ion-label>
+        <h2>End Date</h2>
+        <ion-datetime-button datetime="endDate"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="endDate" presentation="date-time" [value]="plan.data.endDate"
+              [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+              (ionChange)="updatePlanEndDateInput($event.detail.value)"></ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    }
+    @if(hasPermission(Role.CoOwner)){
+    <ion-item class="input-item">
+      <ion-label>
+        <ion-item>
+          <h1>Members</h1>
+          <ion-icon slot="end" name="mail" style="color: white; font-size: xx-large;" (click)="invitePressed.emit(plan)"></ion-icon>
+        </ion-item>
+        <ion-list style="width: 100%; max-height: 200px; overflow: scroll;">
+          @for(member of plan.data.members; track member){
+          <ion-item-sliding style="background-color: #F2C1D1; border-radius: 25px; margin-bottom: 10px; padding: 0;">
+            <ion-item style="--ion-item-background: #F2C1D1;">
+              <ion-chip style="width: 100%; height: 100%; background-color: transparent">
+                <ion-avatar>
+                  <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                </ion-avatar>
+                <ion-label class="member-label">
+                  <h3>{{member.uid | uidToUsername | async}}</h3>
+                  <p>{{member.role}}</p>
+                </ion-label>
+              </ion-chip>
+              <ion-label slot="end">
+                <ion-icon name="chevron-back"></ion-icon>
+              </ion-label>
+            </ion-item>
+            <ion-item-options side="end">
+              @if(canPromote(member.role)){
+              <ion-item-option style="background-color: yellow;" (click)="promoteMember(member)">
+                <ion-icon slot="icon-only" name="arrow-up"></ion-icon>
+              </ion-item-option>
+              }
+              @if(canDemote(member.role)){
+              <ion-item-option style="background-color: lightblue;" (click)="demoteMember(member)">
+                <ion-icon slot="icon-only" name="arrow-down"></ion-icon>
+              </ion-item-option>
+              }
+              @if(canRemove(member.role)){
+              <ion-item-option color="danger" (click)="removeMember(member)">
+                <ion-icon slot="icon-only" name="close"></ion-icon>
+              </ion-item-option>
+              }
+            </ion-item-options>
+          </ion-item-sliding>
+          }
+        </ion-list>
+      </ion-label>
+    </ion-item>
+    }
+    @if(hasPermission(Role.Planner)){
+    <ion-item class="input-item">
+      <ion-accordion-group
+        style="max-height: 375px; overflow: scroll; width: 100%; padding-top: 20px; padding-bottom: 10px;">
+        @for(location of plan.data.locations; track location){
+        <ion-accordion [value]="location.locationID + 'Accordion'" class="location-accordion">
+          <ion-item slot="header" lines="none">
+            <ion-label>
+              <h2>{{location.location.name}}</h2>
+            </ion-label>
+          </ion-item>
+          <div style="padding: 10px; background-color: #DDA0DD;" slot="content">
+            <ion-list style="background-color: transparent;">
+              <ion-item class="input-item">
+                <h4 style="margin-right: 10px;">Order</h4>
+                <ion-select class="always-flip" toggleIcon="caret-down-sharp" interface="popover"
+                  [placeholder]="location.orderNum" shape="round"
+                  (ionChange)="updatePlanLocationOrder(location.locationID, $event.detail.value)">
+                  @for(option of getOrderOptions(); track option){
+                  <ion-select-option [value]="option">{{option}}</ion-select-option>
+                  }
+                </ion-select>
+              </ion-item>
+              <ion-item class="input-item">
+                <ion-label>
+                  <h2>Start Date</h2>
+                  <ion-datetime-button [datetime]="location.locationID + 'StartDate'"></ion-datetime-button>
+                  <ion-modal [keepContentsMounted]="true">
+                    <ng-template>
+                      <ion-datetime [id]="location.locationID + 'StartDate'" presentation="date-time" [value]="location.startDate"
+                        [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+                        (ionChange)="updatePlanLocationStartDate(location.locationID, $event.detail.value)"></ion-datetime>
+                    </ng-template>
+                  </ion-modal>
+                </ion-label>
+              </ion-item>
+              <ion-item class="input-item">
+                <ion-label>
+                  <h2>End Date</h2>
+                  <ion-datetime-button [datetime]="location.locationID + 'EndDate'"></ion-datetime-button>
+                  <ion-modal [keepContentsMounted]="true">
+                    <ng-template>
+                      <ion-datetime [id]="location.locationID + 'EndDate'" presentation="date-time" [value]="location.endDate"
+                        [formatOptions]="timeButtonFormat" showDefaultButtons="true"
+                        (ionChange)="updatePlanLocationEndDate(location.locationID, $event.detail.value)"></ion-datetime>
+                    </ng-template>
+                  </ion-modal>
+                </ion-label>
+              </ion-item>
+              <ion-item (click)="removeLocation(location.locationID)"
+                style="--ion-item-background: lightcoral; border-radius: 25px; width: 95%; margin: auto; text-align: center; margin-top: 10px;">
+                <ion-label>Remove</ion-label>
+              </ion-item>
+            </ion-list>
+          </div>
+        </ion-accordion>
+        }
+      </ion-accordion-group>
+    </ion-item>
+    }
+  </ion-list>
+</div>

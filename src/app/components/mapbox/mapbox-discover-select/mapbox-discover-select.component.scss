@@ -1,0 +1,34 @@
+.container {
+  background-color: #483D8B;
+  padding: 25px;
+  border-radius: 25px;
+
+  .custom-list {
+    background-color: transparent;
+
+    .result-item {
+      --padding-start: 0;
+      --ion-item-background: coral;
+      border-radius: 25px;
+      margin-bottom: 10px;
+    }
+
+    .result-thumbnail {
+      margin-right: 25px;
+      --size: 90px;
+    }
+
+    .result-label {
+      h3.result-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: larger;
+      }
+
+      p.result-dates,
+      p.result-members {
+        color: white;
+      }
+    }
+  }
+}

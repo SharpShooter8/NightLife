@@ -1,0 +1,20 @@
+.container {
+  background-color: #483D8B;
+  padding: 25px;
+  border-radius: 25px;
+}
+ion-checkbox {
+  background-color: #fa8072;
+  --size: 32px;
+  --checkbox-background-checked: #6815ec;
+  --checkbox-background: white;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 25px;
+}
+
+ion-checkbox::part(container) {
+  border-radius: 9999px;
+  border: 2px solid #6815ec;
+}

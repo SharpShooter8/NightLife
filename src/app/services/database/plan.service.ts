@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/compat/firestore';
-import { FieldValue, serverTimestamp, arrayRemove, arrayUnion } from '@angular/fire/firestore';
+import { arrayRemove, arrayUnion, Timestamp } from '@angular/fire/firestore';
 import { Observable, catchError, defer, forkJoin, from, map, of, switchMap, throwError } from 'rxjs';
 
 @Injectable({
@@ -14,20 +14,25 @@ export class PlanService {
     this.planRef = this.db.collection('Plans');
   }
 
-  createPlan(uid: string, name: string, startDate: string | null, endDate: string | null): Observable<void> {
+  createPlan(uid: string, name: string, startDate: string, endDate: string): Observable<{ id: string, data: PlanData }> {
     return defer(() => {
       const planData: PlanData = {
         name,
-        created: serverTimestamp(),
-        startDate: startDate || serverTimestamp(),
-        endDate: endDate || serverTimestamp(),
+        dateCreated: Timestamp.fromDate(new Date()).toString(),
+        startDate: startDate,
+        endDate: endDate,
         members: [{ uid, role: Role.Owner }],
         userLocations: [],
-        placeLocations: []
+        locations: []
       };
 
       return from(this.planRef.add(planData)).pipe(
-        map(() => { }),
+        switchMap(snapshot => {
+          return from(snapshot.get());
+        }),
+        map(snapshot => {
+          return { id: snapshot.id, data: snapshot.data() as PlanData }
+        }),
         catchError(error => {
           return throwError(() => {
             'Failed to create plan: ' + error
@@ -187,10 +192,14 @@ export class PlanService {
             throw new Error(`Plan document with ID ${planID} does not exist`);
           }
           const members = snapshot.data()?.members as Member[] || [];
+          const memberIndex = members.findIndex(member => member.uid === targetUID);
+          if (memberIndex === -1) {
+            throw new Error(`Member with UID ${targetUID} not found in plan`);
+          }
           if (!this.hasPermission(uid, members, Role.CoOwner)) {
             throw new Error('Not enough permissions to remove member');
           }
-          return from(snapshot.ref.update({ members: arrayRemove({ uid: targetUID }) }));
+          return from(snapshot.ref.update({ members: arrayRemove(members[memberIndex]) }));
         }),
         catchError(error => {
           return throwError(() => {
@@ -280,7 +289,7 @@ export class PlanService {
     });
   }
 
-  getUserPlans(uid: string): Observable<string[]> {
+  getUserPlans(uid: string): Observable<{ id: string, data: PlanData }[]> {
     return defer(() => {
       const ownerQuery = this.planRef.ref
         .where('members', 'array-contains', { uid: uid, role: Role.Owner });
@@ -291,17 +300,17 @@ export class PlanService {
       const attendeeQuery = this.planRef.ref
         .where('members', 'array-contains', { uid: uid, role: Role.Attendee });
       return forkJoin([
-        from(ownerQuery.get()).pipe(switchMap(snapshot => of(snapshot.docs))),
-        from(coOwnerQuery.get()).pipe(switchMap(snapshot => of(snapshot.docs))),
-        from(plannerQuery.get()).pipe(switchMap(snapshot => of(snapshot.docs))),
-        from(attendeeQuery.get()).pipe(switchMap(snapshot => of(snapshot.docs)))
+        from(ownerQuery.get()).pipe(map(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))),
+        from(coOwnerQuery.get()).pipe(map(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))),
+        from(plannerQuery.get()).pipe(map(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))),
+        from(attendeeQuery.get()).pipe(map(snapshot => snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })))),
       ]).pipe(
         map(([ownerDocs, coOwnerDocs, plannerDocs, attendeeDocs]) => {
           return [
-            ...ownerDocs.map(doc => doc.id),
-            ...coOwnerDocs.map(doc => doc.id),
-            ...plannerDocs.map(doc => doc.id),
-            ...attendeeDocs.map(doc => doc.id)
+            ...ownerDocs,
+            ...coOwnerDocs,
+            ...plannerDocs,
+            ...attendeeDocs
           ];
         }),
         catchError(error => {
@@ -313,13 +322,13 @@ export class PlanService {
     });
   }
 
-  getPlanInvites(uid: string): Observable<string[]> {
+  getPlanInvites(uid: string): Observable<{ id: string, data: PlanData }[]> {
     return defer(() => {
       return from(this.planRef.ref
         .where('members', 'array-contains', { uid: uid, role: Role.Invited })
         .get()).pipe(
           switchMap(snapshot => {
-            return of(snapshot.docs.map(doc => doc.id));
+            return of(snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })));
           }),
           catchError(error => {
             return throwError(() => {
@@ -352,7 +361,7 @@ export class PlanService {
     });
   }
 
-  addLocation(uid: string, planID: string, location: Location, orderNum: number): Observable<void> {
+  addLocation(uid: string, planID: string, startDate: string, endDate: string, location: Location, orderNum: number): Observable<void> {
     return defer(() => {
       return this.planRef.doc(planID).get().pipe(
         switchMap(snapshot => {
@@ -363,7 +372,7 @@ export class PlanService {
           if (!this.hasPermission(uid, members, Role.Planner)) {
             throw new Error('Not enough permissions to remove member');
           }
-          const placeLocations = snapshot.data()?.placeLocations as PlaceLocation[];
+          const placeLocations = snapshot.data()?.locations as PlanLocation[];
           if (orderNum < 0 || orderNum > placeLocations.length) {
             orderNum = placeLocations.length;
           }
@@ -371,18 +380,18 @@ export class PlanService {
             location,
             locationID: this.db.createId(),
             addedBy: uid,
-            timeAdded: 'test added',
-            timeStart: 'test start',
-            timeEnd: 'test end',
+            addedDate: this.getFormattedTimestamp(),
+            startDate: startDate,
+            endDate: endDate,
             orderNum,
             attending: []
           });
-          const organizedLocations = placeLocations.map((location, index) => ({ ...location, order_num: index }));
-          return from(snapshot.ref.update({ placeLocations: organizedLocations }));
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
         }),
         catchError(error => {
           return throwError(() => {
-            'Failed to add plan location: ' + error
+            throw new Error('Failed to add plan location: ' + error);
           });
         })
       );
@@ -400,10 +409,10 @@ export class PlanService {
           if (!this.hasPermission(uid, members, Role.Planner)) {
             throw new Error('Not enough permissions to remove member');
           }
-          let placeLocations = snapshot.data()?.placeLocations as PlaceLocation[];
+          let placeLocations = snapshot.data()?.locations as PlanLocation[];
           placeLocations = placeLocations.filter(location => location.locationID !== locationID);
-          const organizedLocations = placeLocations.map((location, index) => ({ ...location, order_num: index }));
-          return from(snapshot.ref.update({ placeLocations: organizedLocations }));
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
         }),
         catchError(error => {
           return throwError(() => {
@@ -425,21 +434,21 @@ export class PlanService {
           if (!this.hasPermission(uid, members, Role.Planner)) {
             throw new Error('Not enough permissions to remove member');
           }
-          let placeLocations = snapshot.data()?.placeLocations as PlaceLocation[] || [];
-          if (newOrderNum < 0 || newOrderNum > placeLocations.length) {
+          let placeLocations = snapshot.data()?.locations as PlanLocation[] || [];
+          if (newOrderNum <= 0 || newOrderNum > placeLocations.length) {
             newOrderNum = placeLocations.length;
           }
           const locationIndex = placeLocations.findIndex(location => location.locationID === locationID);
           if (locationIndex === -1) {
             throw new Error(`Location with ID ${locationID} does not exist in this plan`);
           }
-          if (locationIndex === newOrderNum) {
+          if (locationIndex === newOrderNum - 1) {
             throw new Error(`Location is already in requested order`);
           }
           const locationToMove = placeLocations.splice(locationIndex, 1)[0];
-          placeLocations.splice(newOrderNum, 0, locationToMove);
-          const organizedLocations = placeLocations.map((location, index) => ({ ...location, order_num: index }));
-          return from(snapshot.ref.update({ placeLocations: organizedLocations }));
+          placeLocations.splice(newOrderNum - 1, 0, locationToMove);
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
         }),
         catchError(error => {
           return throwError(() => {
@@ -450,7 +459,7 @@ export class PlanService {
     });
   }
 
-  updateLocationStartTime(uid: string, planID: string, locationID: string, newStartTime: string): Observable<void> {
+  updateLocationStartDate(uid: string, planID: string, locationID: string, newStartDate: string): Observable<void> {
     return defer(() => {
       return this.planRef.doc(planID).get().pipe(
         switchMap(snapshot => {
@@ -461,25 +470,25 @@ export class PlanService {
           if (!this.hasPermission(uid, members, Role.Planner)) {
             throw new Error('Not enough permissions to remove member');
           }
-          let placeLocations = snapshot.data()?.placeLocations as PlaceLocation[] || [];
+          let placeLocations = snapshot.data()?.locations as PlanLocation[] || [];
           const locationIndex = placeLocations.findIndex(location => location.locationID === locationID);
           if (locationIndex === -1) {
             throw new Error(`Location with ID ${locationID} does not exist in this plan`);
           }
-          placeLocations[locationIndex].timeStart = newStartTime;
-          const organizedLocations = placeLocations.map((location, index) => ({ ...location, order_num: index }));
-          return from(snapshot.ref.update({ placeLocations: organizedLocations }));
+          placeLocations[locationIndex].startDate = newStartDate;
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
         }),
         catchError(error => {
           return throwError(() => {
-            'Failed to update plan location start time: ' + error
+            'Failed to update plan location start date: ' + error
           });
         })
       );
     });
   }
 
-  updateLocationEndTime(uid: string, planID: string, locationID: string, newEndTime: string): Observable<void> {
+  updateLocationEndDate(uid: string, planID: string, locationID: string, newEndDate: string): Observable<void> {
     return defer(() => {
       return this.planRef.doc(planID).get().pipe(
         switchMap(snapshot => {
@@ -490,18 +499,79 @@ export class PlanService {
           if (!this.hasPermission(uid, members, Role.Planner)) {
             throw new Error('Not enough permissions to remove member');
           }
-          let placeLocations = snapshot.data()?.placeLocations as PlaceLocation[] || [];
+          let placeLocations = snapshot.data()?.locations as PlanLocation[] || [];
           const locationIndex = placeLocations.findIndex(location => location.locationID === locationID);
           if (locationIndex === -1) {
             throw new Error(`Location with ID ${locationID} does not exist in this plan`);
           }
-          placeLocations[locationIndex].timeEnd = newEndTime;
-          const organizedLocations = placeLocations.map((location, index) => ({ ...location, order_num: index }));
-          return from(snapshot.ref.update({ placeLocations: organizedLocations }));
+          placeLocations[locationIndex].endDate = newEndDate;
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
         }),
         catchError(error => {
           return throwError(() => {
-            'Failed to update plan location end time: ' + error
+            'Failed to update plan location end date: ' + error
+          });
+        })
+      );
+    });
+  }
+
+  addLocationAttendee(uid: string, planID: string, locationID: string): Observable<void> {
+    return defer(() => {
+      return this.planRef.doc(planID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`Plan document with ID ${planID} does not exist`);
+          }
+          const members = snapshot.data()?.members as Member[] || [];
+          if (!this.hasPermission(uid, members, Role.Attendee)) {
+            throw new Error('Not enough permissions to add location attendee');
+          }
+          let placeLocations = snapshot.data()?.locations as PlanLocation[] || [];
+          const locationIndex = placeLocations.findIndex(location => location.locationID === locationID);
+          if (locationIndex === -1) {
+            throw new Error(`Location with ID ${locationID} does not exist in this plan`);
+          }
+          placeLocations[locationIndex].attending.push(uid);
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update plan location attendees: ' + error
+          });
+        })
+      );
+    });
+  }
+
+  removeLocationAttendee(uid: string, planID: string, locationID: string): Observable<void> {
+    return defer(() => {
+      return this.planRef.doc(planID).get().pipe(
+        switchMap(snapshot => {
+          if (!snapshot.exists) {
+            throw new Error(`Plan document with ID ${planID} does not exist`);
+          }
+          const members = snapshot.data()?.members as Member[] || [];
+          if (!this.hasPermission(uid, members, Role.Attendee)) {
+            throw new Error('Not enough permissions to remove location attendee');
+          }
+          let placeLocations = snapshot.data()?.locations as PlanLocation[] || [];
+          const locationIndex = placeLocations.findIndex(location => location.locationID === locationID);
+          if (locationIndex === -1) {
+            throw new Error(`Location with ID ${locationID} does not exist in this plan`);
+          }
+          const index = placeLocations[locationIndex].attending.indexOf(uid);
+          if (index !== -1) {
+            placeLocations[locationIndex].attending.splice(index, 1);
+          }
+          const organizedLocations = placeLocations.map((location, index) => ({ ...location, orderNum: index + 1 }));
+          return from(snapshot.ref.update({ locations: organizedLocations }));
+        }),
+        catchError(error => {
+          return throwError(() => {
+            'Failed to update plan location attendees: ' + error
           });
         })
       );
@@ -528,38 +598,88 @@ export class PlanService {
     });
   }
 
-  private hasPermission(uid: string, members: Member[], requiredRole: Role): boolean {
+  hasPermission(uid: string, members: Member[], requiredRole: Role): boolean {
     const member = members.find(member => member.uid === uid);
     if (!member) return false;
     const role = member.role as Role;
     return rolePrecedence[role] <= rolePrecedence[requiredRole];
   }
+
+  getDemotedRole(currentRole: Role): Role {
+    switch (currentRole) {
+      case Role.Owner:
+        return Role.Owner;
+      case Role.CoOwner:
+        return Role.Planner;
+      case Role.Planner:
+        return Role.Attendee;
+      case Role.Attendee:
+        return Role.Attendee;
+      case Role.Invited:
+        return Role.Invited;
+      default:
+        return Role.Invited; // Default case, should not happen
+    }
+  }
+
+  getPromotedRole(currentRole: Role): Role {
+    switch (currentRole) {
+      case Role.Owner:
+        return Role.Owner;
+      case Role.CoOwner:
+        return Role.CoOwner;
+      case Role.Planner:
+        return Role.CoOwner;
+      case Role.Attendee:
+        return Role.Planner;
+      case Role.Invited:
+        return Role.Invited;
+      default:
+        return Role.Invited; // Default case, should not happen
+    }
+  }
+
+  getFormattedTimestamp(): string {
+    const currentDate = new Date();
+
+    const formatNumber = (value: number): string => (value < 10 ? `0${value}` : `${value}`);
+
+    const year = currentDate.getFullYear().toString();
+    const month = formatNumber(currentDate.getMonth() + 1);
+    const day = formatNumber(currentDate.getDate());
+    const hours = formatNumber(currentDate.getHours());
+    const minutes = formatNumber(currentDate.getMinutes());
+    const seconds = formatNumber(currentDate.getSeconds());
+
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+  }
+
 }
 
 export interface PlanData {
-  name: FieldValue | string;
-  created: FieldValue | string;
-  startDate: FieldValue | string;
-  endDate: FieldValue | string;
-  members: FieldValue | Member[];
-  userLocations: FieldValue | UserLocation[];
-  placeLocations: FieldValue | PlaceLocation[];
+  name: string;
+  dateCreated: string;
+  startDate: string;
+  endDate: string;
+  members: Member[];
+  userLocations: UserLocation[];
+  locations: PlanLocation[];
 }
 
-export interface PlaceLocation {
-  location: FieldValue | Location;
-  locationID: FieldValue | string;
-  addedBy: FieldValue | string;
-  timeAdded: FieldValue | string;
-  timeStart: FieldValue | string;
-  timeEnd: FieldValue | string;
-  orderNum: FieldValue | number;
-  attending: FieldValue | string[];
+export interface PlanLocation {
+  location: Location;
+  locationID: string;
+  addedBy: string;
+  addedDate: string;
+  startDate: string;
+  endDate: string;
+  orderNum: number;
+  attending: string[];
 }
 
 export interface Member {
-  uid: FieldValue | string,
-  role: FieldValue | Role
+  uid: string,
+  role: Role
 }
 
 export enum Role {
@@ -570,7 +690,7 @@ export enum Role {
   Invited = 'invited'
 }
 
-const rolePrecedence = {
+export const rolePrecedence = {
   owner: 1,
   coOwner: 2,
   planner: 3,
@@ -579,17 +699,17 @@ const rolePrecedence = {
 };
 
 export interface UserLocation {
-  uid: FieldValue | string;
-  lat: FieldValue | number;
-  lng: FieldValue | number;
+  uid: string;
+  lat: number;
+  lng: number;
 }
 
 export interface Location {
-  id: FieldValue | string;
-  name: FieldValue | string;
-  lng: FieldValue | number;
-  lat: FieldValue | number;
-  type: FieldValue | LocationType;
+  id: string;
+  name: string;
+  lng: number;
+  lat: number;
+  type: LocationType;
 }
 
 export enum LocationType {
@@ -599,10 +719,10 @@ export enum LocationType {
 
 const defaultPlanData: PlanData = {
   name: 'default name',
-  created: 'default created date',
+  dateCreated: 'default created date',
   startDate: 'default start date',
   endDate: 'default end date',
   members: [],
   userLocations: [],
-  placeLocations: []
+  locations: []
 };

@@ -145,7 +145,7 @@ export class UsernameService {
 }
 
 export interface UsernameData {
-  uid: FieldValue | string;
+  uid: string;
 }
 
 const defaultUsernameData: UsernameData = {

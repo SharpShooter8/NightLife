@@ -1,0 +1,79 @@
+<div class="modal-container">
+
+  <ion-segment [value]="Content.Choices.PlanSelect" (ionChange)="updateContentFromSegment($event.detail.value)">
+    <ion-segment-button [value]="Content.Choices.DiscoverSelect">
+      <ion-label>Discover</ion-label>
+    </ion-segment-button>
+    <ion-segment-button [value]="Content.Choices.PlanSelect">
+      <ion-label>Plans</ion-label>
+    </ion-segment-button>
+    <ion-segment-button [value]="Content.Choices.CustomLocationSelect">
+      <ion-label>Locations</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <div class="content-container">
+    @switch(content.peekContentChoice()){
+    @case(Content.Choices.DiscoverSelect){
+    <app-mapbox-discover-select
+      (selectedPlace)="content.pushContent({choice: Content.Choices.LocationDetail, data: $event})"></app-mapbox-discover-select>
+    }
+    @case(Content.Choices.AddToPlan){
+      <app-mapbox-add-to-plan [location]="content.peekContentData()" (backPressed)="content.popContent()" (confirmedAdd)="content.popContent()"></app-mapbox-add-to-plan>
+    }
+    @case(Content.Choices.LocationDetail){
+    <app-mapbox-location-details [location]="content.peekContentData()"
+      (backPressed)="content.popContent()" (addToPressed)="content.pushContent({choice: Content.Choices.AddToPlan, data: $event})"></app-mapbox-location-details>
+    }
+    @case(Content.Choices.PlanSelect){
+    <app-mapbox-plans-select (planPressed)="content.pushContent({choice: Content.Choices.PlanDetail, data: $event})"
+      (editPressed)="content.pushContent({choice: Content.Choices.PlanEdit, data: $event})"
+      (createPressed)="content.pushContent({choice: Content.Choices.PlanCreate})"
+      (invitesPressed)="content.pushContent({choice: Content.Choices.PlanInviteSelect})"></app-mapbox-plans-select>
+    }
+    @case(Content.Choices.PlanInviteSelect){
+    <app-mapbox-plan-invites-select
+      (planPressed)="content.pushContent({choice: Content.Choices.PlanDetail, data: $event})"
+      (backPressed)="content.popContent()"></app-mapbox-plan-invites-select>
+    }
+    @case(Content.Choices.PlanCreate){
+    <app-mapbox-create-plan (backPressed)="content.popContent()"
+      (planCreated)="content.switchContent({choice: Content.Choices.PlanDetail, data: $event})"></app-mapbox-create-plan>
+    }
+    @case (Content.Choices.PlanDetail) {
+    <app-mapbox-plan-details [plan]="content.peekContentData()"
+      (placeLocation)="content.pushContent({choice: Content.Choices.LocationDetail, data: $event})"
+      (backPressed)="content.popContent()"></app-mapbox-plan-details>
+    }
+    @case(Content.Choices.PlanEdit){
+    <app-mapbox-edit-plan [plan]="content.peekContentData()" (backPressed)="content.popContent()"
+      (confirmedEdit)="content.popContent()"
+      (invitePressed)="content.pushContent({choice: Content.Choices.PlanInviteMember, data: $event})"></app-mapbox-edit-plan>
+    }
+    @case(Content.Choices.PlanInviteMember){
+    <app-mapbox-plan-invite-member [plan]="content.peekContentData()"
+      (backPressed)="content.switchContent({choice: Content.Choices.PlanEdit, data: content.peekContentData()})"></app-mapbox-plan-invite-member>
+    }
+    @case(Content.Choices.CustomLocationSelect){
+    <app-mapbox-custom-locations-select
+      (locationPressed)="content.pushContent({choice: Content.Choices.CustomLocationDetail, data: $event})"
+      (editPressed)="content.pushContent({choice: Content.Choices.CustomLocationEdit, data: $event})"
+      (createPressed)="content.pushContent({choice: Content.Choices.CustomLocationCreate})">
+    </app-mapbox-custom-locations-select>
+    }
+    @case (Content.Choices.CustomLocationDetail) {
+    <app-mapbox-custom-location-details [customLocation]="content.peekContentData()"
+      (backPressed)="content.popContent()"></app-mapbox-custom-location-details>
+    }
+    @case (Content.Choices.CustomLocationCreate){
+    <app-mapbox-create-custom-location (backPressed)="content.popContent()"
+      (locationCreated)="content.switchContent({choice: Content.Choices.CustomLocationDetail, data: $event})"></app-mapbox-create-custom-location>
+    }
+    @case(Content.Choices.CustomLocationEdit){
+    <app-mapbox-edit-custom-location [customLocation]="content.peekContentData()" (backPressed)="content.popContent()"
+      (confirmedEdit)="content.popContent()"></app-mapbox-edit-custom-location>
+    }
+    }
+  </div>
+
+</div>

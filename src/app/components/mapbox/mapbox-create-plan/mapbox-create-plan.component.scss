@@ -1,0 +1,31 @@
+.container {
+  background-color: #483D8B;
+  padding: 25px;
+  border-radius: 25px;
+
+  .create-plan-item {
+    --ion-item-background: lightgreen;
+    width: 95%;
+    border-radius: 25px;
+    margin: auto;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .create-form {
+    background-color: transparent;
+
+    .input-item {
+      --ion-item-background: #E0B0FF;
+      border-radius: 25px;
+      margin-top: 10px;
+    }
+
+    .submit-item {
+      --ion-item-background: lightgreen;
+      border-radius: 25px;
+      margin-top: 10px;
+      text-align: center;
+    }
+  }
+}

@@ -1,0 +1,85 @@
+<div class="container">
+  <ion-item style="--ion-item-background:transparent;" lines="none">
+    <ion-label>
+      <ion-item lines="none">
+        <ion-icon name="arrow-back" (click)="backPressed.emit()"></ion-icon>
+        <h1 style="font-size: xx-large;">Edit Custom Location</h1>
+      </ion-item>
+    </ion-label>
+  </ion-item>
+  <form class="edit-form" (ngSubmit)="editCustomLocation()">
+    <ion-item class="form-item" lines="none">
+      <ion-input name="name" label="Location Name" labelPlacement="stacked" type="text"
+        [(ngModel)]="customLocation.data.location.name"></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-input name="description" label="Description" labelPlacement="stacked" type="text"
+        [(ngModel)]="customLocation.data.location.description"></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-input name="formattedAddress" label="Address" labelPlacement="stacked" type="text"
+        [(ngModel)]="customLocation.data.location.formattedAddress"></ion-input>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-label>
+        <h2>Date</h2>
+        <ion-datetime-button datetime="locationDate"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="locationDate" presentation="date" [formatOptions]="dateTimeButtonFormat"
+              [(ngModel)]="customLocation.data.location.date" [ngModelOptions]="{standalone: true}">
+            </ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-label>
+        <h2>Start Time</h2>
+        <ion-datetime-button datetime="locationStartTime"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="locationStartTime" presentation="time" [formatOptions]="dateTimeButtonFormat"
+              [(ngModel)]="customLocation.data.location.hours.start" [ngModelOptions]="{standalone: true}">
+            </ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      <ion-label>
+        <h2>End Time</h2>
+        <ion-datetime-button datetime="locationEndTime"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="locationEndTime" presentation="time" [formatOptions]="dateTimeButtonFormat"
+              [(ngModel)]="customLocation.data.location.hours.end" [ngModelOptions]="{standalone: true}">
+            </ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    <ion-item class="form-item" lines="none">
+      @if(!customPrice){
+      <ion-select aria-label="Prices" interface="popover" placeholder="Select price"
+        [(ngModel)]="customLocation.data.location.price" [ngModelOptions]="{standalone: true}">
+        <ion-select-option [value]="Price.Free">{{Price.Free}}</ion-select-option>
+        <ion-select-option [value]="Price.Cheap">{{Price.Cheap}}</ion-select-option>
+        <ion-select-option [value]="Price.Affordable">{{Price.Affordable}}</ion-select-option>
+        <ion-select-option [value]="Price.Pricey">{{Price.Pricey}}</ion-select-option>
+        <ion-select-option [value]="Price.Expensive">{{Price.Expensive}}</ion-select-option>
+      </ion-select>
+      } @else {
+      <ion-input name="price" label="Price" labelPlacement="stacked" type="text"
+        [(ngModel)]="customLocation.data.location.price">
+        <ion-icon slot="start" name="pricetag" style="color: lightgreen;"></ion-icon>
+      </ion-input>
+      }
+      <ion-label slot="end">
+        <ion-checkbox [(ngModel)]="customPrice" [ngModelOptions]="{standalone: true}">Custom?</ion-checkbox>
+      </ion-label>
+    </ion-item>
+    <ion-button type="submit" style="--background: lightgreen; border-radius: 25px; width: 100%;">Update
+      Location</ion-button>
+  </form>
+</div>

@@ -1,0 +1,48 @@
+.container {
+  background-color: #483D8B;
+  padding: 25px;
+  border-radius: 25px;
+
+  .create-plan-item {
+    --ion-item-background: lightgreen;
+    width: 95%;
+    border-radius: 25px;
+    margin: auto;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .custom-list {
+    background-color: transparent;
+
+    .result-sliding {
+      border-radius: 25px;
+      margin-bottom: 15px;
+      background-color: #00BFFF;
+    }
+
+    .result-item {
+      --padding-start: 0;
+      --ion-item-background: #00BFFF;
+      border-radius: 25px;
+    }
+
+    .result-thumbnail {
+      margin-right: 25px;
+      --size: 90px;
+    }
+
+    .result-label {
+      h3.result-title {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: larger;
+      }
+
+      p.result-dates,
+      p.result-members {
+        color: white;
+      }
+    }
+  }
+}

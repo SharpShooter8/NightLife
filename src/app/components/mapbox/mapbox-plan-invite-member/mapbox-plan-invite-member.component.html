@@ -1,0 +1,67 @@
+<div class="container">
+  <ion-item style="--ion-item-background:transparent;" lines="none">
+    <ion-icon name="arrow-back" (click)="backPressed.emit()" style="margin-right: 10px;"></ion-icon>
+    <h1 style="font-size: xx-large;">Invite Members</h1>
+  </ion-item>
+
+  <ion-list lines="none"
+    style="max-height: 300px; overflow: scroll; background-color: #F2C75B; border-radius: 25px; padding: 10px;">
+    <ion-list-header style="padding-left: 0;">
+      <ion-item style="--ion-item-background: #8B008B; border-radius: 25px; width: 100%;">
+        <ion-input label="" placeholder="Find Username" [clearInput]="true" (ionChange)="findUser($event.detail.value)">
+          <ion-icon slot="start" name="search-outline" aria-hidden="true"></ion-icon>
+        </ion-input>
+      </ion-item>
+    </ion-list-header>
+    @if(searching){
+    <ion-item style="--ion-item-background: transparent;">
+      <ion-label>
+        <h1>Finding User</h1>
+      </ion-label>
+    </ion-item>
+    @if(foundUser && foundUserUID){
+    <ion-item style="--ion-item-background: #BF5D21; margin-bottom: 10px; border-radius: 25px;">
+      <ion-label>
+        <h1 style="font-size: large;">{{foundUser}}</h1>
+      </ion-label>
+      @if(!isInPlan(foundUserUID)){
+      <ion-label slot="end" appHideOnClick (click)="inviteUserToPlan(foundUserUID)">
+        <ion-icon name="mail" style="color:white; font-size: large;"></ion-icon>
+      </ion-label>
+      }
+    </ion-item>
+    } @else{
+    <ion-item style="--ion-item-background: lightcoral; border-radius: 25px;">
+      <ion-label>
+        <h1 style="font-size: large;">Could Not Find User</h1>
+      </ion-label>
+    </ion-item>
+    }
+    } @else {
+    <ion-item style="--ion-item-background: transparent;">
+      <ion-label>
+        <h1>My Friends</h1>
+      </ion-label>
+    </ion-item>
+    @for(friend of friends$ | async; track friend){
+    <ion-item style="--ion-item-background: #BF5D21; margin-bottom: 10px; border-radius: 25px;">
+      <ion-chip style="width: 100%; height: 100%; background-color: transparent">
+        <ion-avatar>
+          <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+        </ion-avatar>
+        <ion-label>
+          <h2>{{friend | uidToUsername | async}}</h2>
+        </ion-label>
+      </ion-chip>
+      @if(!isInPlan(friend)){
+      <ion-label slot="end" appHideOnClick (click)="inviteUserToPlan(friend)">
+        <ion-icon name="mail" style="color:white; font-size: large;"></ion-icon>
+      </ion-label>
+      }
+    </ion-item>
+    }
+    }
+  </ion-list>
+</div>
+
+

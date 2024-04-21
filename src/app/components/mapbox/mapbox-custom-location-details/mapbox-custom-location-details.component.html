@@ -1,0 +1,73 @@
+<ion-grid class="custom-grid">
+  <!-- Title Header -->
+  <ion-row class="title-header">
+    <ion-col>
+      <ion-label>
+        <div class="header-content">
+          <ion-icon name="arrow-back" class="back-icon" (click)="backPressed.emit()"></ion-icon>
+          <ion-label>
+            <h1><strong>{{customLocation.data.location.name}}</strong></h1>
+            <ion-badge style="background-color: lightgreen;">
+              <h3>{{customLocation.data.location.price}}</h3>
+            </ion-badge>
+          </ion-label>
+        </div>
+      </ion-label>
+    </ion-col>
+  </ion-row>
+
+  <!-- Images -->
+  @if(customLocation.data.location.photos && customLocation.data.location.photos.length > 0){
+  <ion-row style="background-color: #ff4040; width: 100%; border-radius: 25px;">
+    <ion-col>
+      <swiper-container style="width: 100%; height: 100%;" [loop]="true" [slidesPerView]="2">
+        @for(photo of customLocation.data.location.photos; track photo){
+        <swiper-slide>
+          <ion-thumbnail style="--size: 100%; --border-radius: 25px; padding: 2%;">
+            <ion-img src="https://ionicframework.com/docs/img/demos/thumbnail.svg" />
+          </ion-thumbnail>
+        </swiper-slide>
+        }
+      </swiper-container>
+    </ion-col>
+  </ion-row>
+  }
+
+  <!-- Location Details -->
+  <ion-row class="location-details-row">
+    <ion-col>
+      <ion-item class="location-details-item" lines="none">
+        <ion-label>
+          <h3><strong>Address</strong></h3>
+          <h3>{{customLocation.data.location.formattedAddress}}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item class="location-details-item" lines="none">
+        <ion-label>
+          <h3><strong>Description</strong></h3>
+          <h3>{{customLocation.data.location.description}}</h3>
+        </ion-label>
+      </ion-item>
+      <ion-item class="location-details-item" lines="none">
+        <ion-datetime presentation="date" [highlightedDates]="[{
+          date: customLocation.data.location.date,
+          textColor: 'white',
+          backgroundColor: 'lightgreen',
+        }]" style="margin-top: 20px; margin-bottom: 10px; border-radius: 25px;" readonly="true"
+          [min]="getFirstDayOfMonth(customLocation.data.location.date)"
+          [max]="getLastDayOfMonth(customLocation.data.location.date)">
+          <span slot="buttons">
+            <ion-label>
+              <ion-item style="--ion-item-background: #8a2be2; border-radius: 25px; margin-bottom: 10px;" lines="none">
+                <h3>Start Time: <strong>{{customLocation.data.location.hours.start}}</strong></h3>
+              </ion-item>
+              <ion-item style="--ion-item-background: #8a2be2; border-radius: 25px;" lines="none">
+                <h3>End Time: <strong>{{customLocation.data.location.hours.end}}</strong></h3>
+              </ion-item>
+            </ion-label>
+          </span>
+        </ion-datetime>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+</ion-grid>

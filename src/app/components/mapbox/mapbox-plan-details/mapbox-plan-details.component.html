@@ -1,0 +1,143 @@
+<ion-grid class="custom-grid">
+
+  <!-- Title Header -->
+  <ion-row class="title-header">
+    <ion-col>
+      <div class="header-content">
+        <ion-icon name="arrow-back" class="back-icon" (click)="backPressed.emit()"></ion-icon>
+        <h1 class="plan-title"><strong>{{plan.data.name}}</strong></h1>
+      </div>
+    </ion-col>
+  </ion-row>
+
+  <!-- Dates -->
+  <ion-row class="date-row">
+    <ion-col>
+      <ion-item class="date-item" lines="none">
+        <ion-label>
+          <ion-chip>
+            <ion-label>
+              <h3><strong>Start Date</strong></h3>
+              <h3>{{timestampToDisplayTime(plan.data.startDate)}}</h3>
+            </ion-label>
+          </ion-chip>
+          <ion-chip>
+            <ion-label>
+              <h3><strong>End Date</strong></h3>
+              <h3>{{timestampToDisplayTime(plan.data.endDate)}}</h3>
+            </ion-label>
+          </ion-chip>
+        </ion-label>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+
+  <!-- Members -->
+  <ion-row class="members-row">
+    <ion-col>
+      <ion-item class="members-item" lines="none">
+        <ion-label>
+          <ion-label>
+            <h1 class="members-title">Members</h1>
+          </ion-label>
+          <swiper-container [slidesPerView]="2" class="members-swiper">
+            @for(member of plan.data.members; track member){
+            <swiper-slide class="member-slide">
+              <ion-chip class="member-chip">
+                <ion-avatar>
+                  <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                </ion-avatar>
+                <ion-label class="member-label">
+                  <h3>{{member.uid | uidToUsername | async}}</h3>
+                  <p>{{member.role}}</p>
+                </ion-label>
+              </ion-chip>
+            </swiper-slide>
+            }
+          </swiper-container>
+        </ion-label>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+
+  <!-- Locations -->
+  <ion-row class="locations-row">
+    <ion-col>
+      <swiper-container class="locations-swiper" #swiper>
+        @for(location of plan.data.locations; track location){
+        <swiper-slide class="location-slide">
+          <ion-grid class="location-grid">
+            <ion-row>
+              <ion-col>
+                <ion-item class="location-header" lines="full">
+                  <ion-icon style="padding-right: 5px;" name="chevron-back" (click)="swiper.swiper.slidePrev()"></ion-icon>
+                  <h1>{{(location.location.id | fsqidToPlace | async)?.name}}</h1>
+                  <ion-icon style="padding-left: 5px;" name="chevron-forward" (click)="swiper.swiper.slideNext()"></ion-icon>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-badge class="location-badge-go" (click)="emitPlaceLocation(location.location.id)">
+              Go To
+            </ion-badge>
+            <ion-badge class="location-badge-order">{{location.orderNum}}</ion-badge>
+            <ion-row>
+              <ion-col>
+                <ion-item class="location-date-item" lines="none">
+                  <ion-label>
+                    <ion-chip>
+                      <ion-label>
+                        <h3><strong>Start Date</strong></h3>
+                        <h3>{{timestampToDisplayTime(location.startDate)}}</h3>
+                      </ion-label>
+                    </ion-chip>
+                    <ion-chip>
+                      <ion-label>
+                        <h3><strong>End Date</strong></h3>
+                        <h3>{{timestampToDisplayTime(location.endDate)}}</h3>
+                      </ion-label>
+                    </ion-chip>
+                  </ion-label>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+            <ion-row>
+              <ion-col>
+                <ion-item class="location-attendance-item" lines="none">
+                  <ion-label>
+                    <ion-text>
+                      <h2 class="attendance-title">Attending
+                        @if(isAttending(location.attending)){
+                        <ion-icon name="remove-circle" class="cancel-icon"
+                          (click)="cancelAttendence(plan.id, location.locationID)"></ion-icon>
+                        } @else {
+                        <ion-icon name="add-circle" class="confirm-icon"
+                          (click)="confirmAttendence(plan.id, location.locationID)"></ion-icon>
+                        }
+                      </h2>
+                    </ion-text>
+                    <swiper-container [slidesPerView]="2" class="attendance-swiper">
+                      @for(attendee of location.attending; track attendee){
+                      <swiper-slide class="attendance-slide">
+                        <ion-chip class="attendance-chip">
+                          <ion-avatar>
+                            <img alt="Silhouette of a person's head"
+                              src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                          </ion-avatar>
+                          <ion-label class="attendance-label">
+                            <h3>{{attendee | uidToUsername | async}}</h3>
+                          </ion-label>
+                        </ion-chip>
+                      </swiper-slide>
+                      }
+                    </swiper-container>
+                  </ion-label>
+                </ion-item>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </swiper-slide>
+        }
+      </swiper-container>
+    </ion-col>
+  </ion-row>
+</ion-grid>

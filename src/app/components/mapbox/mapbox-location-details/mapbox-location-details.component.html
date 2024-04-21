@@ -1,0 +1,93 @@
+<ion-grid style="height: auto; background-color: #483D8B; border-radius: 25px;">
+  <!-- Title -->
+  <ion-row>
+    <ion-col>
+      <ion-item style="--ion-item-background:transparent;" lines="none">
+        <ion-icon name="arrow-back" class="back-icon" (click)="backPressed.emit()"></ion-icon>
+        <ion-label style="display: flex; flex-direction: column; width: 70%;">
+          <ion-text style="font-size: x-large; color: white;">
+            <strong>{{location.name}}</strong>
+          </ion-text>
+          <div style="display: flex; align-items: flex-end;">
+            <h3 style="margin-right: 10px;">
+              @for(star of getStars(location.rating); track star){
+              @if(star === 'full_star'){
+              <ion-icon name="star" style="color: yellow;"></ion-icon>
+              } @else if(star === 'half_star'){
+              <ion-icon name="star-half" style="color: yellow;"></ion-icon>
+              }
+              }
+            </h3>
+            <h3 style="color: lightgreen;">
+              @for(price of getPrice(location.price); track price){
+              <ion-icon style="color: lightgreen;" name="pricetag"></ion-icon>
+              }
+            </h3>
+          </div>
+        </ion-label>
+        <ion-label slot="end">
+          <ion-icon name="add-circle" style="color: greenyellow; font-size: xx-large;"
+            (click)="addToPressed.emit(location)"></ion-icon>
+        </ion-label>
+      </ion-item>
+    </ion-col>
+  </ion-row>
+
+  <!-- Photos -->
+  <ion-row>
+    <ion-col>
+      <swiper-container [loop]="true" [slidesPerView]="2" style="width: 100%; height: 100%;">
+        @for(photo of location.photos; track photo){
+        <swiper-slide>
+          <ion-thumbnail style="--size: 100%; --border-radius: 25px; padding: 2%;">
+            <ion-img [src]="getPlacePhotoSrc(photo)" />
+          </ion-thumbnail>
+        </swiper-slide>
+        }
+      </swiper-container>
+    </ion-col>
+  </ion-row>
+
+  <!-- Details -->
+  <ion-row>
+    <ion-col>
+      <ion-list style="background-color: #7851A9; border-radius: 25px; padding-top: 10px; padding-bottom: 10px;" lines="none">
+        <ion-item style="--ion-item-background: transparent;">
+          <ion-label>
+            <h1>Address</h1>
+            <h4>{{location.location.formatted_address}}</h4>
+          </ion-label>
+        </ion-item>
+        <ion-item style="--ion-item-background: transparent;">
+          <ion-label>
+            <h1>Hours</h1>
+            <h4>{{location.hours.display}}</h4>
+          </ion-label>
+        </ion-item>
+        <ion-item style="--ion-item-background: transparent;">
+          <ion-label>
+            <h1>Website</h1>
+            <a [href]="location.website">{{location.website}}</a>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-col>
+  </ion-row>
+
+  <!-- Tips -->
+  <ion-row>
+    <ion-col>
+      <swiper-container [loop]="true" [slidesPerView]="1" style="height: 100%;">
+        @for(tip of location.tips; track tip){
+        <swiper-slide style="background-color: #66cccc; border-radius: 25px;">
+          <ion-item lines="none" style=" width: 100%; height: 100%; --ion-item-background: transparent">
+            <ion-label>
+              <h2>{{tip.text}}</h2>
+            </ion-label>
+          </ion-item>
+        </swiper-slide>
+        }
+      </swiper-container>
+    </ion-col>
+  </ion-row>
+</ion-grid>

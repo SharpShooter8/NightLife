@@ -1,0 +1,48 @@
+<div class="container">
+  <ion-item style="--ion-item-background:transparent;" lines="none">
+    <ion-label>
+      <ion-item lines="none">
+        <ion-icon name="arrow-back" (click)="backPressed.emit()"></ion-icon>
+        <h1 style="font-size: xx-large;">Create Plan</h1>
+      </ion-item>
+    </ion-label>
+  </ion-item>
+  <form class="create-form" (ngSubmit)="createPlan()">
+    <ion-item class="input-item">
+      <ion-input label="Enter Plan Name" label-placement="floating" fill="outline" placeholder="Plan Name"
+        [(ngModel)]="name" [ngModelOptions]="{standalone: true}"></ion-input>
+    </ion-item>
+    <ion-item class="input-item">
+      <ion-label>
+        <h2>Start Date</h2>
+        <ion-datetime-button datetime="startDate"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="startDate" presentation="date-time" [value]="startDate"
+              [formatOptions]="dateTimeButtonFormat" [(ngModel)]="startDate" [ngModelOptions]="{standalone: true}">
+            </ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    <ion-item class="input-item">
+      <ion-label>
+        <h2>End Date</h2>
+        <ion-datetime-button datetime="endDate"></ion-datetime-button>
+        <ion-modal [keepContentsMounted]="true">
+          <ng-template>
+            <ion-datetime id="endDate" presentation="date-time" [value]="endDate" [formatOptions]="dateTimeButtonFormat"
+              [(ngModel)]="endDate" [ngModelOptions]="{standalone: true}">
+            </ion-datetime>
+          </ng-template>
+        </ion-modal>
+      </ion-label>
+    </ion-item>
+    <ion-item class="submit-item" (click)="createPlan()">
+      <ion-label>
+        <h1>Submit</h1>
+      </ion-label>
+    </ion-item>
+  </form>
+
+</div>

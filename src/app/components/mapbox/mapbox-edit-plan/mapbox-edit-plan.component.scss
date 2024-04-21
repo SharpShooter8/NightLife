@@ -1,0 +1,26 @@
+.container {
+  background-color: #9867C5;
+  border-radius: 25px;
+  padding: 20px;
+}
+
+.input-item {
+  --ion-item-background: #720058;
+  border-radius: 25px;
+  margin-top: 10px;
+}
+
+.location-accordion {
+  margin-bottom: 10px;
+  width: 100%;
+  border-radius: 25px;
+  --ion-item-background: #DDA0DD;
+}
+
+ion-select.always-flip::part(icon) {
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+ion-select.always-flip.select-expanded::part(icon) {
+  transform: rotate(180deg);
+}

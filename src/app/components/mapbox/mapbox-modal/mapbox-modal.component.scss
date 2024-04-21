@@ -1,0 +1,30 @@
+.modal-container {
+  background-color: #d399e7;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  padding-bottom: 50px;
+}
+
+ion-segment {
+  margin: auto;
+  width: 90%;
+  background-color: #613F75;
+  margin-bottom: 15px;
+  border-radius: 25px;
+}
+
+ion-segment-button::part(indicator-background) {
+  background: #08a391;
+  border-radius: 25px;
+}
+
+.content-container {
+  background-color: transparent;
+  width: 100%;
+  height: 100%;
+  overflow-y: scroll;
+  padding-bottom: 20px;
+}
+
+

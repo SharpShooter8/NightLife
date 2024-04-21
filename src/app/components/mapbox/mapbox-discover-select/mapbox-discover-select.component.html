@@ -1,0 +1,23 @@
+<div class="container">
+  <ion-item style="--ion-item-background:transparent;" lines="none">
+    <ion-label>
+      <ion-item lines="none">
+        <h1 style="font-size: xx-large;">Nearby Places</h1>
+      </ion-item>
+    </ion-label>
+  </ion-item>
+  <ion-list class="custom-list" lines="none">
+    @for(place of (places$ | async); track place){
+    <ion-item class="result-item" (click)="selectedPlace.emit(place)">
+      <ion-thumbnail class="result-thumbnail">
+        <ion-img [src]="getPlacePhotoSrc(place.photos[0])" />
+      </ion-thumbnail>
+      <ion-label class="result-label">
+        <h3 style="overflow: hidden; text-overflow: ellipsis; font-size: larger;"><strong>{{place.name}}</strong></h3>
+        <p>Distance: {{metersToMiles(place.distance)}}</p>
+        <p>Rating: {{place.rating}}</p>
+      </ion-label>
+    </ion-item>
+    }
+  </ion-list>
+</div>
